@@ -4,11 +4,15 @@ public class Developer {
 
 	private String name;
 	private String email;
+
+	public Developer() {
+	}
 	
 	public Developer(String name, String email) {
 		setEmail(email);
 		setName(name);
 	}
+	
 	/**
 	 * @return the name
 	 */

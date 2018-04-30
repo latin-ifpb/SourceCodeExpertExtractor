@@ -29,6 +29,7 @@ public class RepositoryController {
 	private String linkProjectRemote;
 	private List<RevCommit> commitsLocal;
 	private Set<Developer> teamDeveloper;
+	private Set<String> filesProject;
 
 	/**
 	 * Method cloning repository remote
@@ -105,23 +106,6 @@ public class RepositoryController {
 
 	private String getRemoteUrl() throws IOException {
 		return remote.getRepository().getDirectory().getCanonicalPath();
-	}
-
-	public void getNameFilesProject() {
-		this.commitsLocal.stream().forEach(c -> {
-			try {
-				TreeWalk treeWalk = new TreeWalk(local.getRepository());
-				treeWalk.addTree(c.getTree());
-				treeWalk.setRecursive(true);
-				while (treeWalk.next()) {
-					System.out.println("found: " + treeWalk.getPathString());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		});
 	}
 
 	public Integer getQuantityCommitLocal() {
@@ -234,19 +218,69 @@ public class RepositoryController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "RepositoryController [remote=" + remote + ", local=" + local + ", linkProjectLocal=" + linkProjectLocal
 				+ ", linkProjectRemote=" + linkProjectRemote + ", commitsLocal=" + commitsLocal + ", teamDeveloper="
 				+ teamDeveloper + "]";
+	}
+
+	/**
+	 * @return the commitsLocal
+	 */
+	public List<RevCommit> getCommitsLocal() {
+		return commitsLocal;
+	}
+
+	/**
+	 * @return the filesProject
+	 */
+	public Set<String> getFilesProject() {
+		return filesProject;
+	}
+
+	/**
+	 * @param filesProject the filesProject to set
+	 */
+	public void setFilesProject() {
+		this.filesProject = new HashSet<>();
+		
+		if(this.commitsLocal.isEmpty()) {
+			setCommitsLocal();
+		}
+		
+		this.commitsLocal.stream().forEach(c -> {
+			try {
+				TreeWalk treeWalk = new TreeWalk(local.getRepository());
+				treeWalk.addTree(c.getTree());
+				treeWalk.setRecursive(true);
+				while (treeWalk.next()) {
+					if(!treeWalk.getPathString().contains(Constants.FILES_IGNORE[0]) &&
+						 !treeWalk.getPathString().contains(Constants.FILES_IGNORE[1])&&
+						   !treeWalk.getPathString().contains(Constants.FILES_IGNORE[2]) &&
+						     !treeWalk.getPathString().contains(Constants.FILES_IGNORE[3]) &&
+						        !treeWalk.getPathString().contains(Constants.FILES_IGNORE[4]) &&
+						          !treeWalk.getPathString().contains(Constants.FILES_IGNORE[5]) &&
+						          	!treeWalk.getPathString().contains(Constants.FILES_IGNORE[6])){						
+										
+							filesProject.add(treeWalk.getPathString());
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		});
+	}
+
+	/**
+	 * @param teamDeveloper the teamDeveloper to set
+	 */
+	public void setTeamDeveloper(Set<Developer> teamDeveloper) {
+		this.teamDeveloper = teamDeveloper;
 	}
 
 }
