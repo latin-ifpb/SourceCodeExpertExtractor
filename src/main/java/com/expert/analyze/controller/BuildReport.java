@@ -14,6 +14,9 @@ public class BuildReport {
 	private PrintWriter recordFile;
 	private File file;
 
+	public BuildReport(){
+		creatDirectoryDefault();
+	}
 	public void creatDirectoryDefault() {
 		new File(Constants.PATH_DEFAULT_REPORT).mkdir();
 	}

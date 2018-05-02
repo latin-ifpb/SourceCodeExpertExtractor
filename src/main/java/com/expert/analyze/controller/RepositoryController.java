@@ -20,6 +20,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.util.Constants;
+import com.expert.analyze.util.Validador;
 
 public class RepositoryController {
 
@@ -83,9 +84,8 @@ public class RepositoryController {
 		List<String> branches = new ArrayList<String>();
 		try {
 			try {
-				local = Git.open(new File(linkProjectLocal));
+				openRepository();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			refs = local.branchList().call();
@@ -93,9 +93,9 @@ public class RepositoryController {
 				branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1, ref.getName().length()));
 			}
 			Collections.sort(branches);
+
 		} catch (InvalidRemoteException e) {
 			System.err.println(e.getMessage());
-			e.printStackTrace();
 		} catch (TransportException e) {
 			System.err.println(e.getMessage());
 		} catch (GitAPIException e) {
@@ -202,15 +202,13 @@ public class RepositoryController {
 	public void setCommitsLocal() {
 		commitsLocal = new ArrayList<RevCommit>();
 		try {
-			local = Git.open(new File(linkProjectLocal));
-
+			openRepository();
 			Iterable<RevCommit> log = local.log().call();
 			for (RevCommit commit : log) {
 				commitsLocal.add(commit);
 				// System.out.println(commit.getId() + ": "+ commit.getAuthorIdent() + " : "+
 				// commit.getCommitTime());
 			}
-
 		} catch (NoHeadException e) {
 			e.printStackTrace();
 		} catch (GitAPIException e) {
@@ -218,7 +216,6 @@ public class RepositoryController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
 	}
 
 	@Override
@@ -226,6 +223,10 @@ public class RepositoryController {
 		return "RepositoryController [remote=" + remote + ", local=" + local + ", linkProjectLocal=" + linkProjectLocal
 				+ ", linkProjectRemote=" + linkProjectRemote + ", commitsLocal=" + commitsLocal + ", teamDeveloper="
 				+ teamDeveloper + "]";
+	}
+
+	private void openRepository() throws IOException {
+		local = Git.open(new File(linkProjectLocal));
 	}
 
 	/**
@@ -243,41 +244,35 @@ public class RepositoryController {
 	}
 
 	/**
-	 * @param filesProject the filesProject to set
+	 * @param filesProject
+	 *            the filesProject to set
 	 */
 	public void setFilesProject() {
 		this.filesProject = new HashSet<>();
-		
-		if(this.commitsLocal.isEmpty()) {
+
+		if (this.commitsLocal.isEmpty()) {
 			setCommitsLocal();
 		}
-		
+
 		this.commitsLocal.stream().forEach(c -> {
 			try {
 				TreeWalk treeWalk = new TreeWalk(local.getRepository());
 				treeWalk.addTree(c.getTree());
 				treeWalk.setRecursive(true);
 				while (treeWalk.next()) {
-					if(!treeWalk.getPathString().contains(Constants.FILES_IGNORE[0]) &&
-						 !treeWalk.getPathString().contains(Constants.FILES_IGNORE[1])&&
-						   !treeWalk.getPathString().contains(Constants.FILES_IGNORE[2]) &&
-						     !treeWalk.getPathString().contains(Constants.FILES_IGNORE[3]) &&
-						        !treeWalk.getPathString().contains(Constants.FILES_IGNORE[4]) &&
-						          !treeWalk.getPathString().contains(Constants.FILES_IGNORE[5]) &&
-						          	!treeWalk.getPathString().contains(Constants.FILES_IGNORE[6])){						
-										
-							filesProject.add(treeWalk.getPathString());
+					if (Validador.isFileValid(treeWalk)) {
+						filesProject.add(treeWalk.getPathString());
 					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		});
 	}
 
 	/**
-	 * @param teamDeveloper the teamDeveloper to set
+	 * @param teamDeveloper
+	 *            the teamDeveloper to set
 	 */
 	public void setTeamDeveloper(Set<Developer> teamDeveloper) {
 		this.teamDeveloper = teamDeveloper;

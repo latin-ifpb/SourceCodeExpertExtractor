@@ -75,6 +75,5 @@ public class MeasurePerCommit  extends Measure{
 	public void setDevPerCommits(Map<Developer, Integer> devPerCommits) {
 		this.devPerCommits = devPerCommits;
 	}
-	
-	
+		
 }
