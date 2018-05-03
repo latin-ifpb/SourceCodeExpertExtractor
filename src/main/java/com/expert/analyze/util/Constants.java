@@ -11,6 +11,7 @@ public class Constants {
 	public static String VALID_INFORMATION = "Por favor, informe um valor válido";
 	public static String[] FILES_IGNORE = {".settings/",".project",".sql",".jar",".png",".gitignore",".classpath"};
 	public static Double PERCENTE_TOTAL = 100D;
+	public static String PROTOCOL = ";";
 	
 }
 

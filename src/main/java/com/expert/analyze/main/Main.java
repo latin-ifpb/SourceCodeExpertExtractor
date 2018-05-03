@@ -118,10 +118,16 @@ public class Main {
 		System.out.println("--------- MESOURES PER LINES CHANGE ----------");
 		
 		MeasurePerLine mpl = new MeasurePerLine(repositorio.getLocal().getRepository());
-		mpl.linesChange();
-		mpl.teste(repositorio.getCommitsLocal(),"src/br/edu/popjudge/bean/UserBean.java",Constants.PATH_DEFAULT+projectTeste+"\\");
-		
-		
+		//mpl.linesChange();
+		mpl.linesChangeInFile(repositorio.getLocal(),repositorio.getCommitsLocal(),"src/br/edu/popjudge/bean/UserBean.java",Constants.PATH_DEFAULT+projectTeste+"\\");
+		repositorio.getTeamDeveloper().iterator().forEachRemaining(dev -> {
+			System.out.println("\n");
+			System.out.println(" Developer: "+dev.getName());
+			System.out.println(" -----------------");
+			mpl.linesChangeInFilePerDeveloper(repositorio.getLocal(),repositorio.getCommitsLocal(),"src/br/edu/popjudge/bean/UserBean.java",Constants.PATH_DEFAULT+projectTeste+"\\",dev);
+			System.out.println(" -----------------");
+		});
+			
 	}
 
 	// private static String input(String message) {
