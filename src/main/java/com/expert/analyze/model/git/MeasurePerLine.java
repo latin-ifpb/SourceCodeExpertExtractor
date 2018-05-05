@@ -1,4 +1,4 @@
-package com.expert.analyze.model;
+package com.expert.analyze.model.git;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -29,12 +30,11 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 
+import com.expert.analyze.model.Developer;
 import com.expert.analyze.util.Constants;
 import com.expert.analyze.util.Validador;
 
-public class MeasurePerLine {
-
-	private Repository repository;
+public class MeasurePerLine extends Measure {
 
 	public MeasurePerLine(Repository repository) {
 		setRepository(repository);
@@ -44,26 +44,23 @@ public class MeasurePerLine {
 		int currentLines = 0;
 		try {
 			List<RevCommit> commitsComparer = new ArrayList<>();
-			// commitsComparer.addAll(commits.stream().filter(c ->
-			// c.getAuthorIdent().getName().equalsIgnoreCase("José
-			// Renan")).collect(Collectors.toList()));
-
 			List<String> linesChange = new ArrayList<>();
+
 			for (int i = 0; i < commits.size() - 1; i++) {
 
 				ObjectId commitIDOld = commits.get(i).getId();
-				if (Validador.isFileExistInCommit(commits.get(i), repository, fileName)) {
+
+				if (Validador.isFileExistInCommit(commits.get(i), getRepository(), fileName)) {
+
 					if (i != commits.size() - 1 && !commitsComparer.contains(commits.get(i))) {
 						ObjectId commitIDNew = commits.get(i + 1);
 						commitsComparer.add(commits.get(i));
 						linesChange.add(diff(git, commitIDOld.getName(), commitIDNew.getName(), fileName));
-
 					}
 
 					try (final FileInputStream input = new FileInputStream(pathRepository + "\\" + fileName)) {
 						currentLines = IOUtils.readLines(input, "UTF-8").size();
 					}
-					// System.out.println("Lines inn Commit:" + lines +"Line now:"+currentLines);
 				}
 
 			}
@@ -107,14 +104,14 @@ public class MeasurePerLine {
 		int linesDeleted = 0;
 		DiffFormatter df = null;
 		try {
-			AbstractTreeIterator oldTreeParser = prepareTreeParser(repository, commitIDOld);
-			AbstractTreeIterator newTreeParser = prepareTreeParser(repository, commitIDNew);
+			AbstractTreeIterator oldTreeParser = prepareTreeParser(getRepository(), commitIDOld);
+			AbstractTreeIterator newTreeParser = prepareTreeParser(getRepository(), commitIDNew);
 
 			List<DiffEntry> diffs = git.diff().setOldTree(oldTreeParser).setNewTree(newTreeParser)
 					.setPathFilter(PathFilter.create(fileName)).call();
 
 			df = new DiffFormatter(DisabledOutputStream.INSTANCE);
-			df.setRepository(repository);
+			df.setRepository(getRepository());
 			df.setDiffComparator(RawTextComparator.DEFAULT);
 			df.setDetectRenames(true);
 
@@ -131,22 +128,15 @@ public class MeasurePerLine {
 					linesAdded += edit.getEndB() - edit.getBeginB();
 				}
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (GitAPIException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException | GitAPIException e) {
+			System.err.println("Error:" + e.getMessage());
 		}
-		// System.out.println("linesAdded: " + linesAdded + " ld: " + linesDeleted);
 
 		return linesAdded + ";" + linesDeleted;
 
 	}
 
 	private static AbstractTreeIterator prepareTreeParser(Repository repository, String objectId) throws IOException {
-		// from the commit we can build the tree which allows us to construct the
-		// TreeParser noinspection Duplicates
 		try (RevWalk walk = new RevWalk(repository)) {
 			RevCommit commit = walk.parseCommit(ObjectId.fromString(objectId));
 			RevTree tree = walk.parseTree(commit.getTree().getId());
@@ -162,20 +152,17 @@ public class MeasurePerLine {
 		}
 	}
 
-	private static int countLinesOfFileInCommit(Repository repository, ObjectId commitID, String name)
-			throws IOException {
+	public int countLinesOfFileInCommit(Repository repository, ObjectId commitID, String name) throws IOException {
 		try (RevWalk revWalk = new RevWalk(repository)) {
 			RevCommit commit = revWalk.parseCommit(commitID);
 			RevTree tree = commit.getTree();
-			// System.out.println("Having tree: " + tree);
-
-			// now try to find a specific file
+			
 			try (TreeWalk treeWalk = new TreeWalk(repository)) {
 				treeWalk.addTree(tree);
 				treeWalk.setRecursive(true);
 				treeWalk.setFilter(PathFilter.create(name));
 				if (!treeWalk.next()) {
-					throw new IllegalStateException("Did not find expected file 'README.md'");
+					throw new IllegalStateException("Did not find expected file " + name);
 				}
 
 				ObjectId objectId = treeWalk.getObjectId(0);
@@ -192,19 +179,13 @@ public class MeasurePerLine {
 		}
 	}
 
-	/**
-	 * @return the repository
-	 */
-	public Repository getRepository() {
-		return repository;
+	public void showChangeFilePerAllDevelopers(Git git, List<RevCommit> commits, String fileName, String pathRepository, Set<Developer> developer){	
+		developer.iterator().forEachRemaining(dev -> {
+			System.out.println("\n");
+			System.out.println(" Developer: "+dev.getName());
+			System.out.println(" -----------------");			
+			linesChangeInFilePerDeveloper(git,commits, fileName,pathRepository,dev);
+			System.out.println(" -----------------");
+		});
 	}
-
-	/**
-	 * @param repository
-	 *            the repository to set
-	 */
-	public void setRepository(Repository repository) {
-		this.repository = repository;
-	}
-
 }

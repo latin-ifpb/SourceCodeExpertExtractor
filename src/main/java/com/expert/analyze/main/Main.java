@@ -1,141 +1,239 @@
 package com.expert.analyze.main;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.Scanner;
+
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.TransportException;
 
 import com.expert.analyze.controller.BuildReport;
-import com.expert.analyze.controller.RepositoryController;
-import com.expert.analyze.model.MeasurePerCommit;
-import com.expert.analyze.model.MeasurePerFile;
-import com.expert.analyze.model.MeasurePerLine;
+import com.expert.analyze.controller.RepositoryGitController;
+import com.expert.analyze.model.Developer;
+import com.expert.analyze.model.git.MeasurePerCommit;
+import com.expert.analyze.model.git.MeasurePerFile;
+import com.expert.analyze.model.git.MeasurePerLine;
 import com.expert.analyze.util.Constants;
+import com.expert.analyze.util.Validador;
 
 public class Main {
-	// https://github.com/JoseRenan/POP-Judge
-	private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
-	private static String projectTeste = "teste2";
+	// https://github.com/WemersonThayne/projeto_poo
+	// private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
+	// private static String projectTeste = "teste2";
+
+	private static RepositoryGitController repositorio;
+	private static MeasurePerCommit measurePerCommit;
+	private static String projeto = null;
+	private static String linkRepositorio = null;
 
 	public static void main(String[] args) {
+		int op = -1;
+		while (op != 0) {
 
-		// String projeto = null;
-		// String linkRepositorio = null;
-		// Scanner sc = new Scanner(System.in);
-		// int valido = 0;
+			op = menuInicialGit();
 
-		System.out.println("-------- BEM VINDO AO EXPERT ANALYZER ------------");
-		System.out.println("\n\n");
+			switch (op) {
+			case 1:
+				repositorioInit();
+				break;
+			case 2:
+				measurePerCommit();
+				break;
+			case 3:
+				buildTXTPerCommit();
+				break;
+			case 4:
+				buildCSVPerCommit();
+				break;
+			case 5:
+				measurePerFile();
+				break;
+			case 6:
+				measurePerLineChange();
+				break;
+			default:
+				System.out.println("Saindo da aplicação...");
+				break;
+			}
+		}
+	}
 
-		// projeto = input(Constants.INPUT_REPOSITORY);
-		// linkRepositorio = input(Constants.NAME_PROJETO);
-		RepositoryController repositorio = new RepositoryController();
-		repositorio.setLinkProjectLocal(Constants.PATH_DEFAULT + projectTeste);
-		repositorio.setLinkProjectRemote(linkTeste);
-		// RepositoryController repositorio = new RepositoryController(projeto,linkRepo
-		// sitorio);
+	private static String input(String message) throws IllegalArgumentException {
+		Scanner sc = new Scanner(System.in);
+		System.out.println(message);
+		String input = sc.nextLine();
+		System.out.println("\n");
+		return input;
+	}
 
-		/*
-		 * if(repositorio.cloneRepository()){
-		 * System.out.println("Repositorio clonado com suceso"); }
-		 */
+	private static int menuInicialGit() {
+		System.out.println("");
+		System.out.println("--- Menu de Opções para repositório Git ---");
+		System.out.println(" 1 - Clone Repositório");
+		System.out.println(" 2 - Métrica Por Commit");
+		System.out.println(" 3 - Exportar TXT Métrica Por Commit");
+		System.out.println(" 4 - Exportar CSV Métrica Por Commit");
+		System.out.println(" 5 - Métrica Por File");
+		System.out.println(" 6 - Métrica Por Linhas Modificadas");
+		System.out.println(" 0 - Sair");
+		System.out.println("");
+		try {
+			int op = Integer.parseInt(input("Digite a opção desejada:"));
+			while (op != 0) {
+				if (op >= 1 && op <= 6) {
+					return op;
+				} else {
+					System.err.println("Opção Invalida.....");
+					op = Integer.parseInt(input("Digite a opção desejada:"));
+				}
+			}
 
-		// repositorio.cloneRepository(linkTeste,projectTeste);
-		// System.out.println(repositorio.getBranchesRemote());
-		repositorio.setCommitsLocal();
-		repositorio.setTeamDeveloper();
+		} catch (Exception e) {
+			return 0;
+		}
 
-		System.out.println("Branch Project:" + repositorio.getBranchesLocal());
-		System.out.println("Quantity Commit on Project: " + repositorio.getQuantityCommitLocal());
-		System.out.println("Team Developer:" + repositorio.getTeamDeveloper());
-		repositorio.setFilesProject();
-		repositorio.getFilesProject().stream().forEach(f -> {
-			System.out.println("File:" + f);
-		});
+		return 0;
+	}
 
-		System.out.println("\n\n");
+	private static void repositorioInit() {
+
+		linkRepositorio = input(Constants.INPUT_REPOSITORY);
+		projeto = input(Constants.NAME_PROJETO);
+		repositorio = new RepositoryGitController();
+		if (!Validador.isStringEmpty(projeto) && !Validador.isStringEmpty(linkRepositorio)) {
+			repositorio.getRepositoryGit().setLinkProjectLocal(Constants.PATH_DEFAULT + projeto);
+			repositorio.getRepositoryGit().setLinkProjectRemote(linkRepositorio);
+		}
+
+		try {
+			System.out.println("Clonando o repositório, Aguarde pode demorar um pouco....");
+			if (repositorio.cloneRepository(linkRepositorio, projeto)) {
+				System.out.println("Repositorio Clonado com Sucesso...");
+
+				repositorio.loadCommitsLocal();
+				repositorio.loadFilesProject();
+				repositorio.loadTeamDeveloper();
+			}
+		} catch (TransportException e) {
+			e.printStackTrace();
+		} catch (InvalidRemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void measurePerCommit() {
+		System.out.println("");
 		System.out.println("--------- MESOURES PER COMMIT ----------");
-		List<String> data = new ArrayList<>();
-		List<String> dataCSV = new ArrayList<>();
-		MeasurePerCommit m = new MeasurePerCommit();
-		repositorio.getTeamDeveloper().iterator().forEachRemaining(dev -> {
-			int total = 0;
-			total = m.countCommitPerDeveloper(repositorio.getCommitsLocal(), dev);
-			System.out.println("Developer: " + dev.getName() + " has Commit: " + total + " Percente:"
-					+ m.evaluatePercentageCommitsAllProjectPerDeveloper(repositorio.getQuantityCommitLocal(), total));
-			data.add("Developer: " + dev.getName() + " has Commit: " + total + " Percente:"
-					+ m.evaluatePercentageCommitsAllProjectPerDeveloper(repositorio.getQuantityCommitLocal(), total));
-			dataCSV.add(dev.getName() + ";" + total + ";"
-					+ m.evaluatePercentageCommitsAllProjectPerDeveloper(repositorio.getQuantityCommitLocal(), total));
+		measurePerCommit = new MeasurePerCommit();
+		measurePerCommit.developerPerCommits(repositorio.getRepositoryGit().getCommitsLocal(),
+				repositorio.getRepositoryGit().getTeamDeveloper());
 
-		});
+		measurePerCommit.showEvaluateDeveloperPerCommit(repositorio.getRepositoryGit());
+		measurePerCommit.showInformations();
+		System.out.println("Developer Max Commit: " + measurePerCommit.developerMaxContributionInProject());
+		System.out.println("Max Number Commit: " + measurePerCommit.commitMaxContributionPerDeveloper());
+		System.out.println("Developer Min Commit: " + measurePerCommit.developerMinContributionInProject());
+		System.out.println("Min Number Commit: " + measurePerCommit.commitMinContributionPerDeveloper());
+	}
 
-		m.developerPerCommits(repositorio.getCommitsLocal(), repositorio.getTeamDeveloper());
-		System.out.println("Developer Max Commit: " + m.developerMaxContributionInProject());
-		System.out.println("Max Number Commit: " + m.commitMaxContributionPerDeveloper());
-		System.out.println("Developer Min Commit: " + m.developerMinContributionInProject());
-		System.out.println("Min Number Commit: " + m.commitMinContributionPerDeveloper());
-
-		System.out.println("\n\n");
+	public static void buildTXTPerCommit() {
 		System.out.println("--------- BUILD REPORT TXT MEASURE PER COMMIT ----------");
 		BuildReport b = new BuildReport();
-		b.buildReportTXT(Constants.PATH_DEFAULT_REPORT + projectTeste, data);
+		b.buildReportTXT(Constants.PATH_DEFAULT_REPORT + projeto, measurePerCommit.getData());
 
-		System.out.println("\n\n");
+	}
+
+	public static void buildCSVPerCommit() {
 		System.out.println("--------- BUILD REPORT CSV MEASURE PER COMMIT ----------");
-		b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste, dataCSV);
+		BuildReport b = new BuildReport();
+		b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projeto, measurePerCommit.getDataCSV());
+	}
+
+	public static void measurePerFile() {
 
 		System.out.println("\n\n");
 		System.out.println("--------- MESOURES PER FILES ----------");
 
-		MeasurePerFile mpf = new MeasurePerFile(repositorio.getLocal().getRepository());
-		repositorio.getTeamDeveloper().iterator().forEachRemaining(dev -> {
-			Integer count;
-			count = mpf.evaluateQuantityCommitPerFilePerDeveloper(repositorio.getCommitsLocal(),"WebContent/webapp/user/prob.xhtml", dev);
-			System.out.println("File: WebContent/webapp/user/prob.xhtml "+" Developer: "+dev.getName() +" has Quantity Commit in: " + count);
-		});
-		System.out.println("\n\n");
-		System.out.println("--------- MESOURES DEVELOPER PER FILES ----------");
-		mpf.evaluateQuantityCommitPerFilesPerDeveloper(repositorio.getCommitsLocal(), repositorio.getFilesProject(), repositorio.getTeamDeveloper().iterator().next());
-		mpf.showDevelopersPerFiles(mpf.getDeveloperPerFiles());
-		
-		System.out.println("\n\n");
-		System.out.println("--------- MESOURES DEVELOPERES PER FILES ----------");
-		//mpf.evaluateQuantityCommitPerFilesPerDevelopers(repositorio.getCommitsLocal(), repositorio.getFilesProject(), repositorio.getTeamDeveloper());
-		//mpf.showDevelopersPerFiles(mpf.getDevelopersPerFiles());
-		System.out.println("\n\n");
-		System.out.println("--------- MESOURES FILES PER DEVELOPERES ----------");
-		//mpf.evaluateQuantityCommitInFilesPerDevelopers(repositorio.getCommitsLocal(), repositorio.getFilesProject(), repositorio.getTeamDeveloper());
-		
-		System.out.println("\n\n");
-		System.out.println("--------- MESOURES FILE PER DEVELOPERES ----------");
-		mpf.evaluateQuantityCommitInFilePerDevelopers(repositorio.getCommitsLocal(), "WebContent/webapp/user/prob.xhtml", repositorio.getTeamDeveloper());
-		
-		System.out.println("\n\n");
-		System.out.println("-------------------------------");
-		mpf.developerMaxQuantityCommitPerFile("WebContent/webapp/user/prob.xhtml");
-		mpf.developerMimQuantityCommitPerFile("WebContent/webapp/user/prob.xhtml");
-		
-		System.out.println("\n\n");
+		MeasurePerFile mpf;
+		try {
+			mpf = new MeasurePerFile(repositorio.getRepositoryGit().getLocal().getRepository());
+			System.out.println("--------- MESOURES DEVELOPER SPECIFIC PER FILES ----------");
+			Developer d = queryDeveloperPerName();
+			if (d != null) {
+				mpf.evaluateQuantityCommitPerFilesPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),
+						repositorio.getRepositoryGit().getFilesProject(), d);
+				mpf.showDevelopersPerFiles(mpf.getDeveloperPerFiles());
+			} else {
+				System.out.println("Desenvolvedor não encontrado...");
+			}
+
+			System.out.println("\n --------- MESOURES ALL DEVELOPERES PER ALL FILES ----------");
+			mpf.evaluateQuantityCommitPerFilesPerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
+					repositorio.getRepositoryGit().getFilesProject(),
+					repositorio.getRepositoryGit().getTeamDeveloper());
+			mpf.showDevelopersPerFiles(mpf.getDevelopersPerFiles());
+
+			System.out.println("\n --------- MESOURES FILES PER DEVELOPERES ----------");
+			mpf.evaluateQuantityCommitInFilesPerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
+					repositorio.getRepositoryGit().getFilesProject(),
+					repositorio.getRepositoryGit().getTeamDeveloper());
+			mpf.showFilesPerDevelopers();
+			
+			System.out.println("\n--------- MESOURES FILE SPECIFIC PER DEVELOPERES ----------");
+			String fileName = queryFilePerName();
+			if (!Validador.isStringEmpty(fileName)) {
+				mpf.evaluateQuantityCommitInFilePerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
+						fileName, repositorio.getRepositoryGit().getTeamDeveloper());
+				System.out.println("\n--------- MESOURES FILE SPECIFIC MAX COMMIT  ----------");
+				mpf.developerMaxQuantityCommitPerFile(fileName);
+				System.out.println("\n--------- MESOURES FILE SPECIFIC MIN COMMIT  ----------");
+				mpf.developerMimQuantityCommitPerFile(fileName);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public static void measurePerLineChange(){
+		System.out.println("");
 		System.out.println("--------- MESOURES PER LINES CHANGE ----------");
 		
-		MeasurePerLine mpl = new MeasurePerLine(repositorio.getLocal().getRepository());
-		//mpl.linesChange();
-		mpl.linesChangeInFile(repositorio.getLocal(),repositorio.getCommitsLocal(),"src/br/edu/popjudge/bean/UserBean.java",Constants.PATH_DEFAULT+projectTeste+"\\");
-		repositorio.getTeamDeveloper().iterator().forEachRemaining(dev -> {
-			System.out.println("\n");
-			System.out.println(" Developer: "+dev.getName());
-			System.out.println(" -----------------");
-			mpl.linesChangeInFilePerDeveloper(repositorio.getLocal(),repositorio.getCommitsLocal(),"src/br/edu/popjudge/bean/UserBean.java",Constants.PATH_DEFAULT+projectTeste+"\\",dev);
-			System.out.println(" -----------------");
-		});
-			
+		MeasurePerLine mpl;
+		try {
+			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
+			String fileName = queryFilePerName();
+			if (!Validador.isStringEmpty(fileName)) {			
+				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),repositorio.getRepositoryGit().getCommitsLocal(),fileName,Constants.PATH_DEFAULT+projeto+"\\");
+				mpl.showChangeFilePerAllDevelopers(repositorio.getRepositoryGit().getLocal(),repositorio.getRepositoryGit().getCommitsLocal(),fileName,Constants.PATH_DEFAULT+projeto+"\\",repositorio.getRepositoryGit().getTeamDeveloper());
+			}
+		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-	// private static String input(String message) {
-	// Scanner sc = new Scanner(System.in);
-	// System.out.println(message);
-	// String input = sc.nextLine();
-	// System.out.println("\n");
-	// return input;
-	// }
+	private static Developer queryDeveloperPerName() {
+		String name = input("Digite o nome do Desenvolver para pesquisar");
+		Developer d = repositorio.getRepositoryGit().getTeamDeveloper().stream().filter(dev -> {
+			if (dev.getName().equalsIgnoreCase(name)) {
+				return true;
+			} else {
+				return false;
+			}
+		}).findAny().orElse(null);
+		return d;
+	}
 
+	private static String queryFilePerName() {
+		String name = input("Digite o nome do arquivo para pesquisar");
+		String fileName = repositorio.getRepositoryGit().getFilesProject().stream().filter(file -> {
+			if (file.contains(name)) {
+				return true;
+			} else {
+				return false;
+			}
+		}).findAny().orElse(null);
+		return fileName;
+	}
 }

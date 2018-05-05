@@ -1,4 +1,4 @@
-package com.expert.analyze.model;
+package com.expert.analyze.model.git;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -11,9 +11,10 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
-public class MeasurePerFile {
+import com.expert.analyze.model.Developer;
 
-	private Repository repository;
+public class MeasurePerFile extends Measure {
+
 	private Map<Developer, Map<String, Integer>> developerPerFiles;
 	private Map<Developer, Map<String, Integer>> developersPerFiles;
 	private Map<String, Map<Developer, Integer>> filePerDeveloper;
@@ -79,14 +80,6 @@ public class MeasurePerFile {
 				}
 			filesPerDeveloper.put(fileName, developerQuantityCommit);
 		}
-
-		for (Map.Entry<String, Map<Developer, Integer>> cd : filesPerDeveloper.entrySet()) {
-			Map<Developer, Integer> values = cd.getValue();
-			for (Map.Entry<Developer, Integer> v : values.entrySet()) {
-				System.out.println(
-						"File: " + cd.getKey() + " File:" + v.getKey().getName() + " Commit: " + v.getValue());
-			}
-		}
 	}
 
 	public void evaluateQuantityCommitInFilePerDevelopers(List<RevCommit> commitsLocal,String fileName,
@@ -121,21 +114,6 @@ public class MeasurePerFile {
 		d = Collections.min(mapDeveloper.entrySet(),(entry1, entry2) -> entry1.getValue() - entry2.getValue()).getKey();
 		System.out.println("Developer:"+ d.getName() + " in File "+fileName + "has min number commit");
 		return d;
-	}
-	
-	/**
-	 * @return the repository
-	 */
-	public Repository getRepository() {
-		return repository;
-	}
-
-	/**
-	 * @param repository
-	 *            the repository to set
-	 */
-	public void setRepository(Repository repository) {
-		this.repository = repository;
 	}
 
 	/**
@@ -188,6 +166,16 @@ public class MeasurePerFile {
 			for (Map.Entry<String, Integer> v : values.entrySet()) {
 				System.out.println(
 						"Developer: " + cd.getKey().getName() + " File:" + v.getKey() + " Commit: " + v.getValue());
+			}
+		}
+	}
+	
+	public void showFilesPerDevelopers() {
+		for (Map.Entry<String, Map<Developer, Integer>> cd : filesPerDeveloper.entrySet()) {
+			Map<Developer, Integer> values = cd.getValue();
+			for (Map.Entry<Developer, Integer> v : values.entrySet()) {
+				System.out.println(
+						"File: " + cd.getKey() + " Developer: " + v.getKey().getName() + " Commit: " + v.getValue());
 			}
 		}
 	}

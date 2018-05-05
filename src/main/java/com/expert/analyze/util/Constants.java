@@ -12,6 +12,7 @@ public class Constants {
 	public static String[] FILES_IGNORE = {".settings/",".project",".sql",".jar",".png",".gitignore",".classpath"};
 	public static Double PERCENTE_TOTAL = 100D;
 	public static String PROTOCOL = ";";
+	public static String ERROR_GET_COMMIT_FIRST = "Error, Need get Commit First";
 	
 }
 
