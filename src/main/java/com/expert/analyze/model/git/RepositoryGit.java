@@ -19,6 +19,7 @@ public class RepositoryGit {
 	private List<RevCommit> commitsLocal;
 	private Set<Developer> teamDeveloper;
 	private Set<String> filesProject;
+	private Set<String> namesFiles;
 	/**
 	 * @return the remote
 	 */
@@ -128,6 +129,18 @@ public class RepositoryGit {
 		return getCommitsLocal().size();
 	}
 	
+	/**
+	 * @return the namesFiles
+	 */
+	public Set<String> getNamesFiles() {
+		return namesFiles;
+	}
+	/**
+	 * @param namesFiles the namesFiles to set
+	 */
+	public void setNamesFiles(Set<String> namesFiles) {
+		this.namesFiles = namesFiles;
+	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -135,7 +148,7 @@ public class RepositoryGit {
 	public String toString() {
 		return "RepositoryGit [remote=" + remote + ", local=" + local + ", linkProjectLocal=" + linkProjectLocal
 				+ ", linkProjectRemote=" + linkProjectRemote + ", commitsLocal=" + commitsLocal + ", teamDeveloper="
-				+ teamDeveloper + ", filesProject=" + filesProject + "]";
+				+ teamDeveloper + ", filesProject=" + filesProject + ", namesFiles=" + namesFiles + "]";
 	}
 	
 }

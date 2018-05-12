@@ -2,6 +2,8 @@ package com.expert.analyze.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -138,6 +140,7 @@ public class RepositoryGitController {
 
 	public void loadFilesProject() {
 		Set<String> filesProject = new HashSet<>();
+		Set<String> namesFiles = new HashSet<>();
 
 		if (repositoryGit.getCommitsLocal().isEmpty()) {
 			System.err.println(Constants.ERROR_GET_COMMIT_FIRST);
@@ -150,6 +153,7 @@ public class RepositoryGitController {
 				treeWalk.setRecursive(true);
 				while (treeWalk.next()) {
 					if (Validador.isFileValid(treeWalk)) {
+						namesFiles.add(treeWalk.getNameString());
 						filesProject.add(treeWalk.getPathString());
 					}
 				}
@@ -159,5 +163,22 @@ public class RepositoryGitController {
 		});
 
 		repositoryGit.setFilesProject(filesProject);
+		repositoryGit.setNamesFiles(namesFiles);
+	}
+	
+	public List<RevCommit> findCommitsPerDate(LocalDate dtInitial, LocalDate dtFinal){
+		List<RevCommit> commitsLocal = new ArrayList<>();
+		if (!repositoryGit.getCommitsLocal().isEmpty()) {
+				repositoryGit.getCommitsLocal().forEach(commit ->{					
+					LocalDate commitDate = commit.getAuthorIdent().getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+					if(commitDate.isAfter(dtInitial) && commitDate.isBefore(dtFinal) ){
+						commitsLocal.add(commit);
+					}
+				});
+				return commitsLocal;
+		}else {
+			System.err.println(Constants.ERROR_GET_COMMIT_FIRST);		
+			return null;
+		}
 	}
 }
