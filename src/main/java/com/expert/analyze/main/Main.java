@@ -188,9 +188,9 @@ public class Main {
 			Developer d = queryDeveloperPerName();
 			queryCommitPerDate();
 			if (d != null) {
-				mpf.evaluateQuantityCommitPerFilesPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),
-						repositorio.getRepositoryGit().getFilesProject(), d);
-				mpf.showDevelopersPerFiles(mpf.getDeveloperPerFiles());
+//				mpf.evaluateQuantityCommitPerFilesPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),
+//						repositorio.getRepositoryGit().getFilesProject(), d);
+//				mpf.showDevelopersPerFiles(mpf.getDeveloperPerFiles());
 			} else {
 				System.out.println("Desenvolvedor não encontrado...");
 			}
@@ -210,12 +210,12 @@ public class Main {
 			System.out.println("\n--------- MESOURES FILE SPECIFIC PER DEVELOPERES ----------");
 			String fileName = queryFilePerName();
 			if (!Validador.isStringEmpty(fileName)) {
-				mpf.evaluateQuantityCommitInFilePerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
-						fileName, repositorio.getRepositoryGit().getTeamDeveloper());
-				System.out.println("\n--------- MESOURES FILE SPECIFIC MAX COMMIT  ----------");
-				mpf.developerMaxQuantityCommitPerFile(fileName);
-				System.out.println("\n--------- MESOURES FILE SPECIFIC MIN COMMIT  ----------");
-				mpf.developerMimQuantityCommitPerFile(fileName);
+//				mpf.evaluateQuantityCommitInFilePerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
+//						fileName, repositorio.getRepositoryGit().getTeamDeveloper());
+//				System.out.println("\n--------- MESOURES FILE SPECIFIC MAX COMMIT  ----------");
+//				mpf.developerMaxQuantityCommitPerFile(fileName);
+//				System.out.println("\n--------- MESOURES FILE SPECIFIC MIN COMMIT  ----------");
+//				mpf.developerMimQuantityCommitPerFile(fileName);
 			}
 			
 			System.out.println("\n\n");

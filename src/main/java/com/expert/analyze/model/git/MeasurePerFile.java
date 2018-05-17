@@ -2,7 +2,6 @@ package com.expert.analyze.model.git;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,15 +14,21 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.model.FileDeveloper;
-import com.expert.analyze.util.Constants;
 import com.expert.analyze.util.Util;
+import com.expert.analyze.util.Validador;
 
+/**
+ * Class responsable to measure expert per file the reposotor
+ * @author wemerson
+ *
+ */
 public class MeasurePerFile extends Measure {
 
-	private Map<Developer, Map<String, Integer>> developerPerFiles;
+	//List the object matrix, relationship file x developer and quantity commit in file
 	private List<FileDeveloper> matrixFileDevelopersPerCommits;
+	//Map contins the developer and file per commit
 	private Map<Developer, Map<String, Integer>> developersPerFiles;
-	private Map<String, Map<Developer, Integer>> filePerDeveloper;
+	//Map the File per developer and commit
 	private Map<String, Map<Developer, Integer>> filesPerDeveloper;
 	private Integer COUNT = 0;
 
@@ -31,145 +36,121 @@ public class MeasurePerFile extends Measure {
 		setRepository(repository);
 	}
 
+	/**
+	 * Evaluate a quantity commit in file per developer
+	 * @param commitsLocal
+	 * @param fileFind
+	 * @param developer
+	 * @return Integer - quantity of commit
+	 */
 	public Integer evaluateQuantityCommitPerFilePerDeveloper(List<RevCommit> commitsLocal, String fileFind,
 			Developer developer) {
 		Integer count = 0;
 		try {
+			//walk in list the commit 
 			for (RevCommit commit : commitsLocal) {
-				TreeWalk treeWalk = new TreeWalk(getRepository());
+				TreeWalk treeWalk = new TreeWalk(getRepository());//defined tree walk in commits
 				treeWalk.addTree(commit.getTree());
-				treeWalk.setRecursive(true);
+				treeWalk.setRecursive(true);//defined for recursive walks
 				while (treeWalk.next()) {
-					if (treeWalk.getPathString().equalsIgnoreCase(fileFind)
-							&& commit.getAuthorIdent().getName().equalsIgnoreCase(developer.getName())
-							&& commit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail())) {
+					//Vefiry is fileFind equal a pathFile in treewalk and is same author on commit
+					if (treeWalk.getPathString().equalsIgnoreCase(fileFind) && Validador.isAuthorCommit(commit.getAuthorIdent(),developer)) {
 						count++;
 					}
 				}
 				treeWalk.close();
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("Error in quantity of commit in file per developer:"+e.getMessage());
 		}
 		return count;
 	}
 
-	public void evaluateQuantityCommitPerFilesPerDeveloper(List<RevCommit> commitsLocal, Set<String> files,
-			Developer developer) {
-		developerPerFiles = new HashMap<>();
-		Map<String, Integer> fileQuantityCommit = new HashMap<>();
-		for (String file : files) {
-			fileQuantityCommit.put(file, evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
-		}
-		developerPerFiles.put(developer, fileQuantityCommit);
-
-	}
-
+	/**
+	 * Generati a matrix with developer specific x file per commit in file
+	 * @param commitsLocal - Commits
+	 * @param files - filespath
+	 * @param developer - developer
+	 */
 	public void evaluateQuantityCommitPerFilesPerDeveloperMatrix(List<RevCommit> commitsLocal, Set<String> files,
 			Developer developer) {
-
 		matrixFileDevelopersPerCommits = new ArrayList<>();
+		//Walk in list the files and get quantity commit per file
 		for (String file : files) {
+			//Create a Set<Developer> for build a matrix
 			Set<Developer> developers = new HashSet<>();
 			List<Integer> commitsQuantity = new ArrayList<>();
+			//Add a quantity the commit in file that developer
 			commitsQuantity.add(evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
 			developers.add(developer);
+			//build matrix 
 			matrixFileDevelopersPerCommits.add(new FileDeveloper(file, developers, commitsQuantity));
-
 		}
-
 	}
 
+	/**
+	 * Generati a matrix with all developers x file per commit in file
+	 * @param commitsLocal
+	 * @param files
+	 * @param developers
+	 */
 	public void evaluateQuantityCommitPerFilesPerDevelopersMatrix(List<RevCommit> commitsLocal, Set<String> files,
 			Set<Developer> developers) {
 
 		matrixFileDevelopersPerCommits = new ArrayList<>();
-
+		//Walk in list the files and get quantity commit per file
 		for (String file : files) {
 			List<Integer> commitsQuantity = new ArrayList<>();
 			for (Developer developer : developers) {
+				//Add a quantity the commit in file that developer
 				commitsQuantity.add(evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
 			}
+			//build matrix 
 			matrixFileDevelopersPerCommits.add(new FileDeveloper(file, developers, commitsQuantity));
 		}
 	}
 
+	/**
+	 * Constract a map with developer per file
+	 * @param commitsLocal 
+	 * @param files
+	 * @param developeres
+	 */
 	public void evaluateQuantityCommitPerFilesPerDevelopers(List<RevCommit> commitsLocal, Set<String> files,
 			Set<Developer> developeres) {
 		developersPerFiles = new HashMap<>();
+		//walks in list the developers
 		for (Developer developer : developeres) {
+			//creat a map with file and quantity the commit
 			Map<String, Integer> fileQuantityCommit = new HashMap<>();
+			//walk in files the reposotory
 			for (String file : files) {
+				//evaluate quantity the commit
 				fileQuantityCommit.put(file, evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
 			}
 			developersPerFiles.put(developer, fileQuantityCommit);
 		}
-
 	}
 
+	/**
+	 * Constract a map with file per developer
+	 * @param commitsLocal
+	 * @param files
+	 * @param developeres
+	 */
 	public void evaluateQuantityCommitInFilesPerDevelopers(List<RevCommit> commitsLocal, Set<String> files,
 			Set<Developer> developeres) {
 		filesPerDeveloper = new HashMap<>();
+		//walks in list the files on repository
 		for (String fileName : files) {
 			Map<Developer, Integer> developerQuantityCommit = new HashMap<>();
+			//walks in list the developers
 			for (Developer developer : developeres) {
-				developerQuantityCommit.put(developer,
-						evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, fileName, developer));
+				//evaluate quantity the commit
+				developerQuantityCommit.put(developer,evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, fileName, developer));
 			}
 			filesPerDeveloper.put(fileName, developerQuantityCommit);
 		}
-	}
-
-	public void evaluateQuantityCommitInFilePerDevelopers(List<RevCommit> commitsLocal, String fileName,
-			Set<Developer> developeres) {
-		filePerDeveloper = new HashMap<>();
-		Map<Developer, Integer> developerQuantityCommit = new HashMap<>();
-		for (Developer developer : developeres) {
-			developerQuantityCommit.put(developer,
-					evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, fileName, developer));
-		}
-		filePerDeveloper.put(fileName, developerQuantityCommit);
-
-		for (Map.Entry<String, Map<Developer, Integer>> cd : filePerDeveloper.entrySet()) {
-			Map<Developer, Integer> values = cd.getValue();
-			for (Map.Entry<Developer, Integer> v : values.entrySet()) {
-				System.out.println(
-						"File: " + cd.getKey() + " Developer:" + v.getKey().getName() + " Commit: " + v.getValue());
-			}
-		}
-	}
-
-	public Developer developerMaxQuantityCommitPerFile(String fileName) {
-		Developer d = new Developer();
-		Map<Developer, Integer> mapDeveloper = filePerDeveloper.get(fileName);
-		d = Collections.max(mapDeveloper.entrySet(), (entry1, entry2) -> entry1.getValue() - entry2.getValue())
-				.getKey();
-		System.out.println("Developer:" + d.getName() + " in File " + fileName + "has max number commit");
-		return d;
-	}
-
-	public Developer developerMimQuantityCommitPerFile(String fileName) {
-		Developer d = new Developer();
-		Map<Developer, Integer> mapDeveloper = filePerDeveloper.get(fileName);
-		d = Collections.min(mapDeveloper.entrySet(), (entry1, entry2) -> entry1.getValue() - entry2.getValue())
-				.getKey();
-		System.out.println("Developer:" + d.getName() + " in File " + fileName + "has min number commit");
-		return d;
-	}
-
-	/**
-	 * @return the developerPerFiles
-	 */
-	public Map<Developer, Map<String, Integer>> getDeveloperPerFiles() {
-		return developerPerFiles;
-	}
-
-	/**
-	 * @param developerPerFiles
-	 *            the developerPerFiles to set
-	 */
-	public void setDeveloperPerFiles(Map<Developer, Map<String, Integer>> developerPerFiles) {
-		this.developerPerFiles = developerPerFiles;
 	}
 
 	/**
@@ -188,20 +169,9 @@ public class MeasurePerFile extends Measure {
 	}
 
 	/**
-	 * @return the filePerDeveloper
+	 * Show infortion the map developer per file
+	 * @param developerPerFiles
 	 */
-	public Map<String, Map<Developer, Integer>> getFilePerDeveloper() {
-		return filePerDeveloper;
-	}
-
-	/**
-	 * @param filePerDeveloper
-	 *            the filePerDeveloper to set
-	 */
-	public void setFilePerDeveloper(Map<String, Map<Developer, Integer>> filePerDeveloper) {
-		this.filePerDeveloper = filePerDeveloper;
-	}
-
 	public void showDevelopersPerFiles(Map<Developer, Map<String, Integer>> developerPerFiles) {
 		for (Map.Entry<Developer, Map<String, Integer>> cd : developerPerFiles.entrySet()) {
 			Map<String, Integer> values = cd.getValue();
@@ -212,6 +182,9 @@ public class MeasurePerFile extends Measure {
 		}
 	}
 
+	/**
+	 * show information the map files per developers
+	 */
 	public void showFilesPerDevelopers() {
 		for (Map.Entry<String, Map<Developer, Integer>> cd : filesPerDeveloper.entrySet()) {
 			Map<Developer, Integer> values = cd.getValue();
@@ -222,12 +195,17 @@ public class MeasurePerFile extends Measure {
 		}
 	}
 
+	/**
+	 * Create a list<String> for export data relationship a matrix the
+	 * commit in file per developer
+	 * @param namesFiles - filesNames
+	 * @return List<String> list the data to export csv
+	 */
 	public List<String> printFileDeveloper(Set<String> namesFiles) {
-
 		List<String> lines = new ArrayList<>();
 		matrixFileDevelopersPerCommits.forEach(m -> {
 			StringBuilder sb = new StringBuilder();
-
+			//verify this firts line to export, and get names the developers
 			if (COUNT == 0) {
 				sb.append(";");
 				for (Developer dev : m.getDevelopers()) {
@@ -237,18 +215,17 @@ public class MeasurePerFile extends Measure {
 				lines.add(sb.toString());
 				COUNT++;
 			} else {
+				//verify filepath and chance per filename
 				sb.append(Util.findFileNamePerPath(namesFiles, m.getFile()));
 				sb.append(";");
+				//add a quantity the commit for ever developer
 				m.getCommits().forEach(c -> {
 					sb.append(c);
 					sb.append(";");
 				});
-
 				lines.add(sb.toString());
 			}
-
 		});
-
 		return lines;
 	}
 

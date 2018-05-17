@@ -6,9 +6,12 @@ import java.io.IOException;
 import org.eclipse.jgit.errors.CorruptObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.TreeWalk;
+
+import com.expert.analyze.model.Developer;
 
 /**
  * Class for validade actions 
@@ -41,6 +44,11 @@ public class Validador {
 		return Boolean.FALSE;
 	}
 	
+	/**
+	 * Verify type the file, if file is the propriets, config, lib or file build per IDE.
+	 * @param treeWalk
+	 * @return true
+	 */
 	public static Boolean isFileValid(TreeWalk treeWalk){
 		if(!treeWalk.getPathString().contains(Constants.FILES_IGNORE[0])
 				&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[1])
@@ -54,6 +62,13 @@ public class Validador {
 		return Boolean.FALSE;
 	}
 	
+	/**
+	 * Verify this file exist in tree the commit
+	 * @param commit
+	 * @param repository
+	 * @param fileFind
+	 * @return
+	 */
 	public static Boolean isFileExistInCommit(RevCommit commit,Repository repository,String fileFind){
 		try {
 			TreeWalk treeWalk = new TreeWalk(repository);
@@ -75,5 +90,18 @@ public class Validador {
 			e.printStackTrace();
 		}
 		return Boolean.FALSE;
+	}
+	
+	/**
+	 * Compare this developer is author the commit
+	 * @param author - author the commit
+	 * @param dev - developer the project
+	 * @return True or False
+	 */
+	public static Boolean isAuthorCommit(PersonIdent author, Developer dev) {
+		 if(author.getName().equalsIgnoreCase(dev.getName()) && author.getEmailAddress().equalsIgnoreCase(dev.getEmail())){
+			 return Boolean.TRUE;
+		 }
+		 return Boolean.FALSE;
 	}
 }

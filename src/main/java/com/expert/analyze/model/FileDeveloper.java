@@ -5,9 +5,9 @@ import java.util.Set;
 
 public class FileDeveloper {
 
-	private String file;
-	private Set<Developer> developers;
-	private List<Integer> commits;
+	private String file;//file name
+	private Set<Developer> developers;//team developers
+	private List<Integer> commits;//quantity the commit in file per team developers
 	
 	public FileDeveloper() {	
 	}

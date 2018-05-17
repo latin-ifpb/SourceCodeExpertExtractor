@@ -10,16 +10,21 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.expert.analyze.model.Developer;
 
+/**
+ * Class for the proprerts the repository git 
+ * @author wemerson
+ *
+ */
 public class RepositoryGit {
 
-	private Git remote;
-	private Git local;
-	private String linkProjectLocal;
-	private String linkProjectRemote;
-	private List<RevCommit> commitsLocal;
-	private Set<Developer> teamDeveloper;
-	private Set<String> filesProject;
-	private Set<String> namesFiles;
+	private Git remote;//repository remote
+	private Git local;// repository local 
+	private String linkProjectLocal; //link for repository local
+	private String linkProjectRemote;// link for repository remote
+	private List<RevCommit> commitsLocal; // List the commtis in repository
+	private Set<Developer> teamDeveloper;// List the team contribution in repository
+	private Set<String> filesProject;// List the filepath
+	private Set<String> namesFiles;// list the filesnames
 	/**
 	 * @return the remote
 	 */
