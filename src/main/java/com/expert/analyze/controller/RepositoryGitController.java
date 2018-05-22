@@ -11,12 +11,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jgit.api.CheckoutCommand;
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 import com.expert.analyze.model.Developer;
@@ -37,23 +40,45 @@ public class RepositoryGitController {
 		repositoryGit = new RepositoryGit();
 	}
 
+	private UsernamePasswordCredentialsProvider configAuthentication(String user, String password) {
+		return new UsernamePasswordCredentialsProvider(user, password ); 
+	}
+	
+	public void clonneRepositoryWithAuthentication(String link, String directory,String branch,String user, String password){
+		 System.out.println("cloning repository private from bitcketebuk");
+		try {
+			Git.cloneRepository()//function responsible to clone repository
+									   .setURI(link)// set link to repository git
+									   .setDirectory(new File(Constants.PATH_DEFAULT + directory))//Defined the path local the cloning
+									   .setCredentialsProvider(configAuthentication(user, password))
+									   .setCloneAllBranches(true)//Defined clone all branch exists on repository
+									   .call();//execute call the clone repository git
+			System.out.println("Cloning sucess.....");
+		} catch (GitAPIException e) {
+			System.err.println("Error Cloning repository " + link + " : "+ e.getMessage());
+		}
+		
+	}
 	/**
 	 * Method cloning repository remote
 	 * 
 	 * @param nomePrjeto
 	 *            - nome do director
-	 * @param link
+	 * @param link - link the repository remote
+	 * @param branch - name branch for clonning
 	 * @return
 	 */
-	public Boolean cloneRepository(String link, String directory) throws TransportException, InvalidRemoteException {
+	public Boolean cloneRepositoryWithOutAuthentication(String link, String directory,String branch) throws TransportException, InvalidRemoteException {
 		try {
 			//Set repository remote for clonning on local analyzer
 			repositoryGit.setRemote(Git.cloneRepository()//function repsponsible to clone reposotory
 									   .setURI(link)// set link to repository git
 									   .setDirectory(new File(Constants.PATH_DEFAULT + directory))//definid the path local the clonnig
+									   //.setBranch(branch)
 									   .setCloneAllBranches(true)//definid clone all brach exists on repository
 									   .call());//execute call the clone repository git
 			repositoryGit.getRemote().close();// close connect and finaly the process the clone repository
+			//chekoutBranch(branch);
 			System.out.println("Cloning sucess.....");
 			return Boolean.TRUE;
 		} catch (GitAPIException e) {
@@ -62,6 +87,46 @@ public class RepositoryGitController {
 		}
 	}
 
+	/**
+	 * Checkout in branch specific remote to local
+	 * @param branch
+	 */
+	private void chekoutBranch(String branch){
+		Git git = repositoryGit.getRemote();
+		CheckoutCommand checkoutCommand = git.checkout()
+			      .setCreateBranch(false)
+			      .setName(branch);
+
+			  List<Ref> refList;
+			try {
+				refList = git.branchList().call();
+				 if (!anyRefMatches(refList,branch)) {
+					    checkoutCommand = checkoutCommand
+					        .setCreateBranch(true)
+					        .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
+					        .setStartPoint("origin/" + branch);
+					  }
+				 
+				 checkoutCommand.call();
+			} catch (GitAPIException e1) {
+				System.err.println("Error checkout branch "+ branch +": "+e1.getMessage());
+			}
+	}
+	/**
+	 * Verify this branch exist in repository remote
+	 * @param refList
+	 * @param branch
+	 * @return
+	 */
+	private boolean anyRefMatches(List<Ref> refList, String branch) {
+	    for (Ref ref : refList) {
+	      if (ref.getName().replace("refs/heads/", "").equals(branch)) {
+	        return true;
+	      }
+	    }
+
+	    return false;
+	  }
 	/**
 	 * Get all branch remote projetc
 	 * 

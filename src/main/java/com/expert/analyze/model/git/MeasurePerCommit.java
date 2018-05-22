@@ -11,6 +11,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.util.Constants;
+import com.expert.analyze.util.Validador;
 
 /**
  * Class contains away meusase identify in repository the expert only the commits in project
@@ -36,8 +37,7 @@ public class MeasurePerCommit extends Measure {
 		//walks in list the commits
 		for (RevCommit c : commits) {
 			//compare the commit AuthorIdent equal a developer
-			if (c.getAuthorIdent().getName().equalsIgnoreCase(developer.getName())
-					&& c.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail())) {
+			if (Validador.isAuthorCommit(c.getAuthorIdent(),developer)) {
 				countCommit++;
 			}
 		}

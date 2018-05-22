@@ -1,7 +1,10 @@
 package com.expert.analyze.model;
 
+import java.util.List;
+
 public class Developer {
 
+	private List<String> nicksNames;
 	private String name;
 	private String email;
 
@@ -12,31 +15,62 @@ public class Developer {
 		setEmail(email);
 		setName(name);
 	}
-	
+	public Developer(String name, String email,List<String> nicks) {
+		setEmail(email);
+		setName(name);
+		setNicksNames(nicks);
+	}
+
+	/**
+	 * @return the nicksNames
+	 */
+	public List<String> getNicksNames() {
+		return nicksNames;
+	}
+
+	/**
+	 * @param nicksNames the nicksNames to set
+	 */
+	public void setNicksNames(List<String> nicksNames) {
+		this.nicksNames = nicksNames;
+	}
+
 	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
 	}
+
 	/**
-	 * @param name the name to set
+	 * @param nome the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	/**
 	 * @return the email
 	 */
 	public String getEmail() {
 		return email;
 	}
+
 	/**
 	 * @param email the email to set
 	 */
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Developer [nicksNames=" + nicksNames + ", name=" + name + ", email=" + email + "]";
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -48,6 +82,7 @@ public class Developer {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -72,12 +107,5 @@ public class Developer {
 			return false;
 		return true;
 	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Developer [name=" + name + ", email=" + email + "]";
-	}
-	
+
 }

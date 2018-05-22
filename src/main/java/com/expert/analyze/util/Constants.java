@@ -13,8 +13,16 @@ public class Constants {
 	public static Double PERCENTE_TOTAL = 100D;
 	public static String PROTOCOL = ";";
 	public static String ERROR_GET_COMMIT_FIRST = "Error, Need get Commit First";
-	public static Integer CONSTANT_ZERO = 0;	
+	public static Integer CONSTANT_ZERO = 0;
+	
+	public static String PROPERTIES = "-prop";
+	public static String MEASUERECOMMIT = "-mc";
+	public static String MEASUERELOC = "-ml";
+	public static String MEASUEREDOK = "-mk";
+	public static String TIME = "--t";
+	public static String TIMEINITIAL = "-ti";
+	public static String TIMEFINAL = "-tf";
+	public static int CONST_INDEX = 1;
+	public static String PROP_PROTOCOL = "=";
+	
 }
-//modelar as duas métricas
-//gerar matriz  -> commit x arquivo/ desevolvedor
-//pesquisa por periodo para gerar as métricas

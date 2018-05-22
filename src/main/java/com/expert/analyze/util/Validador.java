@@ -20,6 +20,8 @@ import com.expert.analyze.model.Developer;
  */
 public class Validador {
 
+	private static TreeWalk treeWalk;
+
 	/**
 	 * Verify this directory exist in path 
 	 * @param file - Directory to create
@@ -71,7 +73,7 @@ public class Validador {
 	 */
 	public static Boolean isFileExistInCommit(RevCommit commit,Repository repository,String fileFind){
 		try {
-			TreeWalk treeWalk = new TreeWalk(repository);
+			treeWalk = new TreeWalk(repository);
 			treeWalk.addTree(commit.getTree());
 			treeWalk.setRecursive(true);
 			while (treeWalk.next()) {
@@ -99,7 +101,7 @@ public class Validador {
 	 * @return True or False
 	 */
 	public static Boolean isAuthorCommit(PersonIdent author, Developer dev) {
-		 if(author.getName().equalsIgnoreCase(dev.getName()) && author.getEmailAddress().equalsIgnoreCase(dev.getEmail())){
+		 if(author.getEmailAddress().equalsIgnoreCase(dev.getEmail())){
 			 return Boolean.TRUE;
 		 }
 		 return Boolean.FALSE;

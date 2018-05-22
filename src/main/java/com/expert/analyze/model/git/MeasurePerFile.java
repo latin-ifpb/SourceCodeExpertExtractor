@@ -216,7 +216,7 @@ public class MeasurePerFile extends Measure {
 				COUNT++;
 			} else {
 				//verify filepath and chance per filename
-				sb.append(Util.findFileNamePerPath(namesFiles, m.getFile()));
+				sb.append(m.getFile());
 				sb.append(";");
 				//add a quantity the commit for ever developer
 				m.getCommits().forEach(c -> {
@@ -226,6 +226,11 @@ public class MeasurePerFile extends Measure {
 				lines.add(sb.toString());
 			}
 		});
+	
+		lines.forEach(l ->{
+			System.out.println(l);
+		});
+		
 		return lines;
 	}
 

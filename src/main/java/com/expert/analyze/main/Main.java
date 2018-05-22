@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.expert.analyze.controller.BuildReport;
+import com.expert.analyze.controller.DeveloperController;
 import com.expert.analyze.controller.RepositoryGitController;
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.model.git.MeasurePerCommit;
@@ -25,8 +26,8 @@ public class Main {
 	// private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
 	// private static String projectTeste = "teste2";
 
-	private static String linkTeste = "https://github.com/WemersonThayne/projeto_poo";
-	private static String projectTeste = "teste2";
+	private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
+	private static String projectTeste = "teste3";
 
 	private static RepositoryGitController repositorio;
 	private static MeasurePerCommit measurePerCommit;
@@ -35,6 +36,10 @@ public class Main {
 	private static String linkRepositorio = null;
 
 	public static void main(String[] args) {
+		
+		 for(int i = 0; i < args.length; i++) {
+	            System.out.println("Args"+args[i]);
+	        }
 		int op = -1;
 		while (op != 0) {
 
@@ -109,9 +114,9 @@ public class Main {
 
 	private static void repositorioInit() {
 
-		// linkRepositorio = input(Constants.INPUT_REPOSITORY);
-		// projeto = input(Constants.NAME_PROJETO);
-
+//		 linkRepositorio = input(Constants.INPUT_REPOSITORY);
+//		 projeto = input(Constants.NAME_PROJETO);
+//
 		linkRepositorio = linkTeste;
 		projeto = projectTeste;
 		repositorio = new RepositoryGitController();
@@ -123,7 +128,7 @@ public class Main {
 		try {
 			if (Validador.isDirectoryExist(new File(Constants.PATH_DEFAULT + projeto))) {
 				System.out.println("Clonando o repositório, Aguarde pode demorar um pouco....");
-				if (repositorio.cloneRepository(linkRepositorio, projeto)) {
+				if (repositorio.cloneRepositoryWithOutAuthentication(linkRepositorio, projeto,null)) {
 					System.out.println("Repositorio Clonado com Sucesso...");
 				}
 			}
@@ -132,6 +137,11 @@ public class Main {
 			repositorio.loadFilesProject();
 			repositorio.loadTeamDeveloper();
 
+			//Normalize team developer 
+			DeveloperController dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
+			dc.contributorsNormalizere();
+			repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
+			
 		} catch (TransportException e) {
 			e.printStackTrace();
 		} catch (InvalidRemoteException e) {
@@ -184,45 +194,10 @@ public class Main {
 
 		try {
 			mpf = new MeasurePerFile(repositorio.getRepositoryGit().getLocal().getRepository());
-			System.out.println("--------- MESOURES DEVELOPER SPECIFIC PER FILES ----------");
-			Developer d = queryDeveloperPerName();
-			queryCommitPerDate();
-			if (d != null) {
-//				mpf.evaluateQuantityCommitPerFilesPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),
-//						repositorio.getRepositoryGit().getFilesProject(), d);
-//				mpf.showDevelopersPerFiles(mpf.getDeveloperPerFiles());
-			} else {
-				System.out.println("Desenvolvedor não encontrado...");
-			}
-
-			System.out.println("\n --------- MESOURES ALL DEVELOPERES PER ALL FILES ----------");
-			mpf.evaluateQuantityCommitPerFilesPerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
-					repositorio.getRepositoryGit().getFilesProject(),
-					repositorio.getRepositoryGit().getTeamDeveloper());
-			mpf.showDevelopersPerFiles(mpf.getDevelopersPerFiles());
-
-			System.out.println("\n --------- MESOURES FILES PER DEVELOPERES ----------");
-			mpf.evaluateQuantityCommitInFilesPerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
-					repositorio.getRepositoryGit().getFilesProject(),
-					repositorio.getRepositoryGit().getTeamDeveloper());
-			mpf.showFilesPerDevelopers();
-
-			System.out.println("\n--------- MESOURES FILE SPECIFIC PER DEVELOPERES ----------");
-			String fileName = queryFilePerName();
-			if (!Validador.isStringEmpty(fileName)) {
-//				mpf.evaluateQuantityCommitInFilePerDevelopers(repositorio.getRepositoryGit().getCommitsLocal(),
-//						fileName, repositorio.getRepositoryGit().getTeamDeveloper());
-//				System.out.println("\n--------- MESOURES FILE SPECIFIC MAX COMMIT  ----------");
-//				mpf.developerMaxQuantityCommitPerFile(fileName);
-//				System.out.println("\n--------- MESOURES FILE SPECIFIC MIN COMMIT  ----------");
-//				mpf.developerMimQuantityCommitPerFile(fileName);
-			}
-			
-			System.out.println("\n\n");
 			mpf.evaluateQuantityCommitPerFilesPerDevelopersMatrix(repositorio.getRepositoryGit().getCommitsLocal(),
 					repositorio.getRepositoryGit().getFilesProject(),
 					repositorio.getRepositoryGit().getTeamDeveloper());
-		
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -236,7 +211,7 @@ public class Main {
 		MeasurePerLine mpl;
 		try {
 			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
-			String fileName = queryFilePerName();
+			String fileName = "teste";
 			if (!Validador.isStringEmpty(fileName)) {
 				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),
 						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
@@ -249,30 +224,6 @@ public class Main {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-	}
-
-	private static Developer queryDeveloperPerName() {
-		String name = input("Digite o nome do Desenvolver para pesquisar");
-		Developer d = repositorio.getRepositoryGit().getTeamDeveloper().stream().filter(dev -> {
-			if (dev.getName().equalsIgnoreCase(name)) {
-				return true;
-			} else {
-				return false;
-			}
-		}).findAny().orElse(null);
-		return d;
-	}
-
-	private static String queryFilePerName() {
-		String name = input("Digite o nome do arquivo para pesquisar");
-		String fileName = repositorio.getRepositoryGit().getFilesProject().stream().filter(file -> {
-			if (file.contains(name)) {
-				return true;
-			} else {
-				return false;
-			}
-		}).findAny().orElse(null);
-		return fileName;
 	}
 
 	private static LocalDate inputDate(String messege) {
