@@ -60,13 +60,11 @@ public class DeveloperController {
 		teamDeveloperNormalizeNicks.forEach(s ->{
 			//Get a nick name list
 			List<String> nicks = getNickNamesDeveloper(s);
-			System.out.println(nicks);
 			//Mount developer with nicks names, name and email unique per developer in team
 			Developer dev = new Developer(nicks.get(Constants.CONSTANT_ZERO),// Get a first name 
 										  s.substring(s.lastIndexOf(",")+1)//get email, plus 1 skip a "," get only email 
 										  ,nicks);
 			teamDeveloper.add(dev);
-			System.out.println(dev);
 		});
 		
 	}

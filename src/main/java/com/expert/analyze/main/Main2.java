@@ -83,7 +83,7 @@ public class Main2 {
 					
 			
 			BuildReport b = new BuildReport();
-			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste, mpf.printFileDeveloper(repositorio.getRepositoryGit().getNamesFiles()));
+			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste, mpf.printFileDeveloper());
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

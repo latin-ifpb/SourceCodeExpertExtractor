@@ -7,30 +7,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.expert.analyze.controller.RunController;
 import com.expert.analyze.model.ConfigCredential;
 import com.expert.analyze.model.ConfigProperties;
 import com.expert.analyze.util.Constants;
 
 public class Run {
 	
-	static ConfigProperties cp = new ConfigProperties();
+	static ConfigProperties configProperties = new ConfigProperties();
 	
 	public static void main(String[] args) {
+		String teste = "-prop C:\\Users\\wemerson\\Desktop\\analyzer_expert.properties -mc -ml -mk --t -ti 01/05/2015 -tf 27/06/2015";
+		args = teste.split(" ");
+		System.out.println("\n\n");
+		System.out.println(Constants.NAME_PROJECT);
+		System.out.println("\n");
+
 		List<String> argsList = Arrays.asList(args);
 		for (int i = 0; i < args.length; i++) {
 			if (argsList.get(i).equalsIgnoreCase("-prop")) {
 				int aux = i + Constants.CONST_INDEX;
-				cp.setConfigCredential(configCloneRepository(readFileProperties(argsList.get(aux))));
+				configProperties.setConfigCredential(configCloneRepository(readFileProperties(argsList.get(aux))));
 				break;
 			}
 		}
 
 		verifyParameters(argsList);
-		if (cp.getTimes()) {
+		if (configProperties.getTimes()) {
 			verifyTimes(argsList);
 		}
-		System.out.println("CP:"+cp);
-
+		
+		RunController run = new RunController(configProperties);
 	}
 
 
@@ -49,8 +56,8 @@ public class Run {
 				dateFinal = argsList.get(aux);
 			}
 		}
-		cp.setDateInitial(dateInitial);
-		cp.setDateFinal(dateFinal);
+		configProperties.setDateInitial(dateInitial);
+		configProperties.setDateFinal(dateFinal);
 	}
 
 	/**
@@ -82,15 +89,15 @@ public class Run {
 
 		for (String p : parameters) {
 			if (p.equalsIgnoreCase(Constants.PROPERTIES)) {
-				cp.setProp(Boolean.TRUE);
+				configProperties.setProp(Boolean.TRUE);
 			} else if (p.equalsIgnoreCase(Constants.MEASUERECOMMIT)) {
-				cp.setMeasureCommit(Boolean.TRUE);
+				configProperties.setMeasureCommit(Boolean.TRUE);
 			} else if (p.equalsIgnoreCase(Constants.MEASUERELOC)) {
-				cp.setMeasureLoc(Boolean.TRUE);
+				configProperties.setMeasureLoc(Boolean.TRUE);
 			} else if (p.equalsIgnoreCase(Constants.MEASUEREDOK)) {
-				cp.setMeasureDOK(Boolean.TRUE);
+				configProperties.setMeasureDOK(Boolean.TRUE);
 			} else if (p.equalsIgnoreCase(Constants.TIME)) {
-				cp.setTimes(Boolean.TRUE);
+				configProperties.setTimes(Boolean.TRUE);
 			}
 		}
 	}

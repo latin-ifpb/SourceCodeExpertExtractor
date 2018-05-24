@@ -45,14 +45,24 @@ public class RepositoryGitController {
 	}
 	
 	public void clonneRepositoryWithAuthentication(String link, String directory,String branch,String user, String password){
-		 System.out.println("cloning repository private from bitcketebuk");
+		 System.out.println("Cloning repository private from bitcketebuk");
 		try {
-			Git.cloneRepository()//function responsible to clone repository
-									   .setURI(link)// set link to repository git
-									   .setDirectory(new File(Constants.PATH_DEFAULT + directory))//Defined the path local the cloning
-									   .setCredentialsProvider(configAuthentication(user, password))
-									   .setCloneAllBranches(true)//Defined clone all branch exists on repository
-									   .call();//execute call the clone repository git
+			if(Validador.isStringEmpty(branch)){
+				Git.cloneRepository()//function responsible to clone repository
+				.setURI(link)// set link to repository git
+				.setDirectory(new File(Constants.PATH_DEFAULT + directory))//Defined the path local the cloning
+				.setCredentialsProvider(configAuthentication(user, password))
+				.setBranch(branch)
+				.setCloneAllBranches(true)//Defined clone all branch exists on repository
+				.call();//execute call the clone repository git
+			}else {
+				Git.cloneRepository()//function responsible to clone repository
+				   .setURI(link)// set link to repository git
+				   .setDirectory(new File(Constants.PATH_DEFAULT + directory))//Defined the path local the cloning
+				   .setCredentialsProvider(configAuthentication(user, password))
+				   .setCloneAllBranches(true)//Defined clone all branch exists on repository
+				   .call();//execute call the clone repository git
+			}
 			System.out.println("Cloning sucess.....");
 		} catch (GitAPIException e) {
 			System.err.println("Error Cloning repository " + link + " : "+ e.getMessage());
@@ -70,15 +80,25 @@ public class RepositoryGitController {
 	 */
 	public Boolean cloneRepositoryWithOutAuthentication(String link, String directory,String branch) throws TransportException, InvalidRemoteException {
 		try {
-			//Set repository remote for clonning on local analyzer
-			repositoryGit.setRemote(Git.cloneRepository()//function repsponsible to clone reposotory
-									   .setURI(link)// set link to repository git
-									   .setDirectory(new File(Constants.PATH_DEFAULT + directory))//definid the path local the clonnig
-									   //.setBranch(branch)
-									   .setCloneAllBranches(true)//definid clone all brach exists on repository
-									   .call());//execute call the clone repository git
-			repositoryGit.getRemote().close();// close connect and finaly the process the clone repository
-			//chekoutBranch(branch);
+			if(!Validador.isStringEmpty(branch)) {				
+				//Set repository remote for clonning on local analyzer
+				repositoryGit.setRemote(Git.cloneRepository()//function repsponsible to clone reposotory
+						.setURI(link)// set link to repository git
+						.setDirectory(new File(Constants.PATH_DEFAULT + directory))//definid the path local the clonnig
+						.setBranch(branch)
+						.setCloneAllBranches(true)//definid clone all brach exists on repository
+						.call());//execute call the clone repository git
+				repositoryGit.getRemote().close();// close connect and finaly the process the clone repository
+			}else {
+				//Set repository remote for clonning on local analyzer
+				repositoryGit.setRemote(Git.cloneRepository()//function repsponsible to clone reposotory
+						.setURI(link)// set link to repository git
+						.setDirectory(new File(Constants.PATH_DEFAULT + directory))//definid the path local the clonnig
+						.setCloneAllBranches(true)//definid clone all brach exists on repository
+						.call());//execute call the clone repository git
+				repositoryGit.getRemote().close();// close connect and finaly the process the clone repository
+			}
+
 			System.out.println("Cloning sucess.....");
 			return Boolean.TRUE;
 		} catch (GitAPIException e) {

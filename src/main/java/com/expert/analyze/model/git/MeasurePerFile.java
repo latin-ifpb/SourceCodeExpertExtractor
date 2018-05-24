@@ -198,10 +198,9 @@ public class MeasurePerFile extends Measure {
 	/**
 	 * Create a list<String> for export data relationship a matrix the
 	 * commit in file per developer
-	 * @param namesFiles - filesNames
 	 * @return List<String> list the data to export csv
 	 */
-	public List<String> printFileDeveloper(Set<String> namesFiles) {
+	public List<String> printFileDeveloper() {
 		List<String> lines = new ArrayList<>();
 		matrixFileDevelopersPerCommits.forEach(m -> {
 			StringBuilder sb = new StringBuilder();

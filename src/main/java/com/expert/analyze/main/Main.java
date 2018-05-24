@@ -183,7 +183,7 @@ public class Main {
 	public static void buildCSVFilesPerCommits() {
 		System.out.println("--------- BUILD REPORT CSV MEASURE PER ----------");
 		BuildReport b = new BuildReport();
-		b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projeto, mpf.printFileDeveloper(repositorio.getRepositoryGit().getNamesFiles()));
+		b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projeto, mpf.printFileDeveloper());
 
 	}
 
