@@ -121,12 +121,12 @@ public class RunController {
 			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
 			String fileName = "teste";
 			if (!Validador.isStringEmpty(fileName)) {
-				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),
-						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
-						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\");
-				mpl.showChangeFilePerAllDevelopers(repositorio.getRepositoryGit().getLocal(),
-						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
-						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\", repositorio.getRepositoryGit().getTeamDeveloper());
+//				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),
+//						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
+//						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\");
+//				mpl.showChangeFilePerAllDevelopers(repositorio.getRepositoryGit().getLocal(),
+//						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
+//						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\", repositorio.getRepositoryGit().getTeamDeveloper());
 			}
 
 		} catch (IOException e) {

@@ -3,15 +3,21 @@ package com.expert.analyze.model.git;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.Edit;
@@ -31,10 +37,13 @@ import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import com.expert.analyze.model.Developer;
+import com.expert.analyze.model.LOCPerFile;
 import com.expert.analyze.util.Constants;
 import com.expert.analyze.util.Validador;
 
 public class MeasurePerLine extends Measure {
+
+	private List<LOCPerFile> locPerFiles = new ArrayList<>();
 
 	public MeasurePerLine(Repository repository) {
 		setRepository(repository);
@@ -89,45 +98,41 @@ public class MeasurePerLine extends Measure {
 		}
 	}
 
-	public void linesChangeInFilePerDeveloper(Git git, List<RevCommit> commits, String fileName, String pathRepository,
-			Developer developer) {
-		List<RevCommit> commitsDeveloper = new ArrayList<>();
-		commitsDeveloper.addAll(commits.stream()
-				.filter(c -> c.getAuthorIdent().getName().equalsIgnoreCase(developer.getName())
-						&& c.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail()))
-				.collect(Collectors.toList()));
-		linesChangeInFile(git, commitsDeveloper, fileName, pathRepository);
-	}
-
 	private String diff(Git git, String commitIDOld, String commitIDNew, String fileName) {
 		int linesAdded = 0;
 		int linesDeleted = 0;
+		// int linesAtual = 0;
 		DiffFormatter df = null;
 		try {
 			AbstractTreeIterator oldTreeParser = prepareTreeParser(getRepository(), commitIDOld);
 			AbstractTreeIterator newTreeParser = prepareTreeParser(getRepository(), commitIDNew);
 
 			List<DiffEntry> diffs = git.diff().setOldTree(oldTreeParser).setNewTree(newTreeParser)
-					.setPathFilter(PathFilter.create(fileName)).call();
+					.setContextLines(0).setCached(false).setPathFilter(PathFilter.create(fileName)).call();
 
+			
 			df = new DiffFormatter(DisabledOutputStream.INSTANCE);
 			df.setRepository(getRepository());
 			df.setDiffComparator(RawTextComparator.DEFAULT);
-			df.setDetectRenames(true);
-
+			df.setDetectRenames(false);
+//			
+//			String OUTPUT_FILE = Constants.PATH_DEFAULT_REPORT+"\\diff"+Constants.TYPE_FILE_TXT;
 			for (DiffEntry entry : diffs) {
-				// System.out.println("Entry: " + entry + ", from: " + entry.getOldId() + ", to:
-				// " + entry.getNewId());
-				// try (DiffFormatter formatter = new DiffFormatter(System.out)) {
-				// formatter.setContext(0);
-				// formatter.setRepository(repository);
-				// formatter.format(entry);
-				// }
-				for (Edit edit : df.toFileHeader(entry).toEditList()) {
-					linesDeleted += edit.getEndA() - edit.getBeginA();
-					linesAdded += edit.getEndB() - edit.getBeginB();
+				if(!entry.getChangeType().equals(DiffEntry.ChangeType.DELETE)) {					
+//					try (DiffFormatter formatter = new DiffFormatter(new FileOutputStream(OUTPUT_FILE))) {
+//						formatter.setContext(0);
+//						formatter.setRepository(getRepository());
+//						formatter.format(entry);
+//					}
+//					
+					for (Edit edit : df.toFileHeader(entry).toEditList()) {
+						linesDeleted += edit.getEndA() - edit.getBeginA();
+						linesAdded += edit.getEndB() - edit.getBeginB();
+					}
 				}
+				
 			}
+				
 		} catch (IOException | GitAPIException e) {
 			System.err.println("Error:" + e.getMessage());
 		}
@@ -152,40 +157,86 @@ public class MeasurePerLine extends Measure {
 		}
 	}
 
-	public int countLinesOfFileInCommit(Repository repository, ObjectId commitID, String name) throws IOException {
-		try (RevWalk revWalk = new RevWalk(repository)) {
-			RevCommit commit = revWalk.parseCommit(commitID);
-			RevTree tree = commit.getTree();
-			
-			try (TreeWalk treeWalk = new TreeWalk(repository)) {
-				treeWalk.addTree(tree);
-				treeWalk.setRecursive(true);
-				treeWalk.setFilter(PathFilter.create(name));
-				if (!treeWalk.next()) {
-					throw new IllegalStateException("Did not find expected file " + name);
+	public void teste(Git git, List<RevCommit> commits, String fileName, Developer developer) {
+		int currentLines = 0;
+		try {
+			//Developer dev = new Developer("Daniel","rerissondaniel@gmail.com");
+			// Filter list commit that developer
+			List<RevCommit> commitDeveloper = commits.stream()
+					.filter(commit -> (commit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail()) && Validador.isFileExistInCommit(commit, getRepository(), fileName)))
+					.collect(Collectors.toList());
+
+			Collections.sort(commitDeveloper, new Comparator<RevCommit>() {
+				public int compare(RevCommit o1, RevCommit o2) {
+					return o1.getAuthorIdent().getTimeZoneOffset() - o2.getAuthorIdent().getTimeZoneOffset();
 				}
-
-				ObjectId objectId = treeWalk.getObjectId(0);
-				ObjectLoader loader = repository.open(objectId);
-
-				// load the content of the file into a stream
-				ByteArrayOutputStream stream = new ByteArrayOutputStream();
-				loader.copyTo(stream);
-
-				revWalk.dispose();
-
-				return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()), "UTF-8").size();
+			});
+			
+			RevCommit prRevCommit = null;
+			if(commitDeveloper.size() > 0) {
+				 prRevCommit = getPreviousCommit(commits, commitDeveloper.get(Constants.CONSTANT_ZERO));
 			}
+			if(prRevCommit != null) {				
+				commitDeveloper.add(0, prRevCommit);
+			}
+
+			List<String> linesChange = new ArrayList<>();	
+			for (RevCommit revCommit : commitDeveloper) {
+				RevCommit nextCommit = getNextCommit(commitDeveloper, revCommit);
+				ObjectId commitIdOld = revCommit.getId();
+				LocalDateTime commitDate = revCommit.getAuthorIdent()
+						.getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+				System.out.println(commitDate);
+				ObjectId commitIdNew = nextCommit != null ? nextCommit.getId() : revCommit.getId();
+				//System.out.println(diff(git, commitIdOld.name(), commitIdNew.name(), fileName));
+				linesChange.add(diff(git, commitIdOld.name(), commitIdNew.name(), fileName));
+
+			}
+			setLOCChanges(linesChange, developer, commitDeveloper.size()-1, fileName);
+		} catch (RevisionSyntaxException  e) {
+			e.printStackTrace();
 		}
 	}
 
-	public void showChangeFilePerAllDevelopers(Git git, List<RevCommit> commits, String fileName, String pathRepository, Set<Developer> developer){	
-		developer.iterator().forEachRemaining(dev -> {
-			System.out.println("\n");
-			System.out.println(" Developer: "+dev.getName());
-			System.out.println(" -----------------");			
-			linesChangeInFilePerDeveloper(git,commits, fileName,pathRepository,dev);
-			System.out.println(" -----------------");
-		});
+	public RevCommit getNextCommit(List<RevCommit> commits, RevCommit commitNext) {
+		int idx = commits.indexOf(commitNext);
+		if (idx < 0 || idx + 1 == commits.size())
+			return null;
+		return commits.get(idx + 1);
 	}
+	
+	public RevCommit getPreviousCommit(List<RevCommit> commits, RevCommit commitActual){
+		int idx = commits.indexOf(commitActual);
+		if (idx >= 0 || idx -1 == commits.size())
+			return null;
+		return commits.get(idx - 1);
+	}
+
+	public void setLOCChanges(List<String> diffs, Developer dev, Integer qtCommits, String fileName) {
+		Integer sumLinesAdd = 0;
+		Integer sumLinesDel = 0;
+		for (String lineChange : diffs) {
+			String[] lChange = lineChange.split(Constants.PROTOCOL);
+			sumLinesAdd += Integer.parseInt(lChange[0]);
+			sumLinesDel += Integer.parseInt(lChange[1]);
+		}
+
+		locPerFiles.add(new LOCPerFile(dev, fileName, qtCommits, sumLinesAdd, sumLinesDel));
+	}
+
+	/**
+	 * @return the locPerFiles
+	 */
+	public List<LOCPerFile> getLocPerFiles() {
+		return locPerFiles;
+	}
+
+	/**
+	 * @param locPerFiles
+	 *            the locPerFiles to set
+	 */
+	public void setLocPerFiles(List<LOCPerFile> locPerFiles) {
+		this.locPerFiles = locPerFiles;
+	}
+
 }

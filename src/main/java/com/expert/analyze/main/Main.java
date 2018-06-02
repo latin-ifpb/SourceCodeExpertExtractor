@@ -201,7 +201,7 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 	}
 
 	public static void measurePerLineChange() {
@@ -216,9 +216,7 @@ public class Main {
 				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),
 						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
 						Constants.PATH_DEFAULT + projeto + "\\");
-				mpl.showChangeFilePerAllDevelopers(repositorio.getRepositoryGit().getLocal(),
-						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
-						Constants.PATH_DEFAULT + projeto + "\\", repositorio.getRepositoryGit().getTeamDeveloper());
+//				
 			}
 
 		} catch (IOException e) {

@@ -11,7 +11,10 @@ import org.eclipse.jgit.api.errors.TransportException;
 import com.expert.analyze.controller.BuildReport;
 import com.expert.analyze.controller.DeveloperController;
 import com.expert.analyze.controller.RepositoryGitController;
+import com.expert.analyze.model.Developer;
+import com.expert.analyze.model.LOCPerFile;
 import com.expert.analyze.model.git.MeasurePerFile;
+import com.expert.analyze.model.git.MeasurePerLine;
 import com.expert.analyze.util.Constants;
 import com.expert.analyze.util.Validador;
 
@@ -22,12 +25,14 @@ public class Main2 {
 	private static String projectTeste = "teste3";
 	private static String repositPrivate = "https://wemersonthayne22@bitbucket.org/wemersonthayne22/expertanalyzer.git";
 
-//	public static void main(String[] args) {
-//		repositorioInit();
-//		//repositorio.findCommitsPerDate(LocalDate.of(2017, 04, 01), LocalDate.of(2017, 05, 01));
-//		//teste();
-//
-//	}
+	public static void main(String[] args) {
+		repositorioInit();
+		// repositorio.findCommitsPerDate(LocalDate.of(2017, 04, 01), LocalDate.of(2017,
+		// 05, 01));
+		// teste();
+
+		testeLOC();
+	}
 
 	private static void repositorioInit() {
 
@@ -41,18 +46,19 @@ public class Main2 {
 			String branch = repositorio.getBranchesRemote().get(Constants.CONSTANT_ZERO);
 			if (Validador.isDirectoryExist(new File(Constants.PATH_DEFAULT + projectTeste))) {
 				System.out.println("Clonando o	 repositório, Aguarde pode demorar um pouco....");
-				if (repositorio.cloneRepositoryWithOutAuthentication(linkTeste, projectTeste,branch)) {
+				if (repositorio.cloneRepositoryWithOutAuthentication(linkTeste, projectTeste, branch)) {
 					System.out.println("Repositorio Clonado com Sucesso...");
 				}
 			}
 			repositorio.loadCommitsLocal();
 			repositorio.loadFilesProject();
 			repositorio.loadTeamDeveloper();
-			System.out.println("Branch Local"+repositorio.getBranchesLocal());
-			
-			repositorio.clonneRepositoryWithAuthentication(repositPrivate,"privateRepositoy",null, "wemersonthayne22","w3m3450n@");
-			
-			//Normalize team developer 
+			System.out.println("Branch Local" + repositorio.getBranchesLocal());
+
+			// repositorio.clonneRepositoryWithAuthentication(repositPrivate,"privateRepositoy",null,
+			// "wemersonthayne22","w3m3450n@");
+
+			// Normalize team developer
 			DeveloperController dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
 			dc.contributorsNormalizere();
 			repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
@@ -80,15 +86,43 @@ public class Main2 {
 			mpf.evaluateQuantityCommitPerFilesPerDevelopersMatrix(repositorio.getRepositoryGit().getCommitsLocal(),
 					repositorio.getRepositoryGit().getFilesProject(),
 					repositorio.getRepositoryGit().getTeamDeveloper());
-					
-			
+
 			BuildReport b = new BuildReport();
 			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste, mpf.printFileDeveloper());
 
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void testeLOC() {
+
+		MeasurePerLine mpl;
+
+		try {
+			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
+			for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
+				for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
+					mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
+							fileName, dev);
+				}
+			}
+			
+//			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
+//			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
+//				System.out.println("Dev:"+dev.getName());
+//				mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
+//						"src/br/edu/popjudge/bean/UsuarioBean.java", dev);
+//			}
+
+			for (LOCPerFile loc : mpl.getLocPerFiles()) {
+				System.out.println(loc);
+			}
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 	}
 
 }

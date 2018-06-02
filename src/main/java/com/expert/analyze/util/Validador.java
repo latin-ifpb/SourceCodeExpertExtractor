@@ -58,7 +58,8 @@ public class Validador {
 						&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[3])
 							&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[4])
 								&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[5])
-									&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[6])){
+									&& !treeWalk.getPathString().contains(Constants.FILES_IGNORE[6])
+									   && !treeWalk.getPathString().contains(Constants.FILES_IGNORE[7])){
 			return Boolean.TRUE;
 		}
 		return Boolean.FALSE;
