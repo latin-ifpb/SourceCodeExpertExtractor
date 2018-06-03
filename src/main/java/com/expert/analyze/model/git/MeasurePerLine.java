@@ -1,215 +1,118 @@
 package com.expert.analyze.model.git;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
-import org.eclipse.jgit.api.BlameCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.blame.BlameResult;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
-import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
-import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
-import org.eclipse.jgit.treewalk.CanonicalTreeParser;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.eclipse.jgit.util.io.DisabledOutputStream;
 
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.model.LOCPerFile;
 import com.expert.analyze.util.Constants;
+import com.expert.analyze.util.GitUtil;
+import com.expert.analyze.util.Util;
 import com.expert.analyze.util.Validador;
 
 public class MeasurePerLine extends Measure {
 
 	private List<LOCPerFile> locPerFiles = new ArrayList<>();
+	private Git git;
 
-	public MeasurePerLine(Repository repository) {
+	public MeasurePerLine(Repository repository,Git git) {
+		setGit(git);
 		setRepository(repository);
 	}
 
-	public void linesChangeInFile(Git git, List<RevCommit> commits, String fileName, String pathRepository) {
-		int currentLines = 0;
-		try {
-			List<RevCommit> commitsComparer = new ArrayList<>();
-			List<String> linesChange = new ArrayList<>();
-
-			for (int i = 0; i < commits.size() - 1; i++) {
-
-				ObjectId commitIDOld = commits.get(i).getId();
-
-				if (Validador.isFileExistInCommit(commits.get(i), getRepository(), fileName)) {
-
-					if (i != commits.size() - 1 && !commitsComparer.contains(commits.get(i))) {
-						ObjectId commitIDNew = commits.get(i + 1);
-						commitsComparer.add(commits.get(i));
-						linesChange.add(diff(git, commitIDOld.getName(), commitIDNew.getName(), fileName));
-					}
-
-					try (final FileInputStream input = new FileInputStream(pathRepository + "\\" + fileName)) {
-						currentLines = IOUtils.readLines(input, "UTF-8").size();
-					}
-				}
-
-			}
-
-			Integer sumLinesAdd = 0;
-			Integer sumLinesDel = 0;
-			for (String lineChange : linesChange) {
-				String[] lChange = lineChange.split(Constants.PROTOCOL);
-				sumLinesAdd += Integer.parseInt(lChange[0]);
-				sumLinesDel += Integer.parseInt(lChange[1]);
-			}
-
-			try (final FileInputStream input = new FileInputStream(pathRepository + "\\" + fileName)) {
-				currentLines = IOUtils.readLines(input, "UTF-8").size();
-			}
-
-			System.out.println("Line actual in file:" + currentLines);
-			System.out.println("Lines Add total:" + sumLinesAdd);
-			System.out.println("Lines Del total:" + sumLinesDel);
-			System.out.println("Total lines change:" + (sumLinesAdd + sumLinesDel));
-
-		} catch (RevisionSyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private String diff(Git git, String commitIDOld, String commitIDNew, String fileName) {
-		int linesAdded = 0;
-		int linesDeleted = 0;
-		// int linesAtual = 0;
+	private String diff(String commitIDOld, String commitIDNew, String fileName) {
+		String diffText = "";
 		DiffFormatter df = null;
 		try {
-			AbstractTreeIterator oldTreeParser = prepareTreeParser(getRepository(), commitIDOld);
-			AbstractTreeIterator newTreeParser = prepareTreeParser(getRepository(), commitIDNew);
+			AbstractTreeIterator oldTreeParser = GitUtil.prepareTreeParser(getRepository(), commitIDOld);
+			AbstractTreeIterator newTreeParser = GitUtil.prepareTreeParser(getRepository(), commitIDNew);
 
-			List<DiffEntry> diffs = git.diff().setOldTree(oldTreeParser).setNewTree(newTreeParser)
-					.setContextLines(0).setCached(false).setPathFilter(PathFilter.create(fileName)).call();
+			List<DiffEntry> diffs = git.diff()
+										.setOldTree(oldTreeParser)
+										.setNewTree(newTreeParser)
+										.setContextLines(0)
+										.setCached(false)
+										.setPathFilter(PathFilter.create(fileName))
+										.call();
 
-			
-			df = new DiffFormatter(DisabledOutputStream.INSTANCE);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			df = new DiffFormatter(out);
+			df.setContext(0);
 			df.setRepository(getRepository());
 			df.setDiffComparator(RawTextComparator.DEFAULT);
-			df.setDetectRenames(false);
-//			
-//			String OUTPUT_FILE = Constants.PATH_DEFAULT_REPORT+"\\diff"+Constants.TYPE_FILE_TXT;
+
 			for (DiffEntry entry : diffs) {
-				if(!entry.getChangeType().equals(DiffEntry.ChangeType.DELETE)) {					
-//					try (DiffFormatter formatter = new DiffFormatter(new FileOutputStream(OUTPUT_FILE))) {
-//						formatter.setContext(0);
-//						formatter.setRepository(getRepository());
-//						formatter.format(entry);
-//					}
-//					
-					for (Edit edit : df.toFileHeader(entry).toEditList()) {
-						linesDeleted += edit.getEndA() - edit.getBeginA();
-						linesAdded += edit.getEndB() - edit.getBeginB();
-					}
-				}
-				
+				// System.out.println(entry.getChangeType());
+				df.format(entry);
+				entry.getOldId();
+				diffText += out.toString("UTF-8");
 			}
-				
+
 		} catch (IOException | GitAPIException e) {
-			System.err.println("Error:" + e.getMessage());
+			System.err.println("Error diff commits:" + e.getMessage());
 		}
 
-		return linesAdded + ";" + linesDeleted;
-
+		return diffText;
 	}
 
-	private static AbstractTreeIterator prepareTreeParser(Repository repository, String objectId) throws IOException {
-		try (RevWalk walk = new RevWalk(repository)) {
-			RevCommit commit = walk.parseCommit(ObjectId.fromString(objectId));
-			RevTree tree = walk.parseTree(commit.getTree().getId());
 
-			CanonicalTreeParser treeParser = new CanonicalTreeParser();
-			try (ObjectReader reader = repository.newObjectReader()) {
-				treeParser.reset(reader, tree.getId());
-			}
-
-			walk.dispose();
-
-			return treeParser;
+	public void resolveCommitsPerDeveloper(Git git, List<RevCommit> commits, String fileName, Developer developer) {
+		List<RevCommit> commitDeveloper = commits.stream()
+				.filter(commit -> (commit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail())
+						&& Validador.isFileExistInCommit(commit, getRepository(), fileName)))
+				.collect(Collectors.toList());
+		Util.sortCommits(commitDeveloper);
+		RevCommit prRevCommit = null;
+		if (commitDeveloper.size() > 0) {
+			prRevCommit = Util.getPreviousCommit(commits, commitDeveloper.get(Constants.CONSTANT_ZERO));
 		}
+		if (prRevCommit != null) {
+			commitDeveloper.add(0, prRevCommit);
+		}
+
+		linesChangePerFile(git, commitDeveloper, fileName, developer);
 	}
 
-	public void teste(Git git, List<RevCommit> commits, String fileName, Developer developer) {
+	public void linesChangePerFile(Git git, List<RevCommit> commitDeveloper, String fileName, Developer developer) {
 		int currentLines = 0;
 		try {
-			//Developer dev = new Developer("Daniel","rerissondaniel@gmail.com");
-			// Filter list commit that developer
-			List<RevCommit> commitDeveloper = commits.stream()
-					.filter(commit -> (commit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail()) && Validador.isFileExistInCommit(commit, getRepository(), fileName)))
-					.collect(Collectors.toList());
+			// //Developer dev = new Developer("Daniel","rerissondaniel@gmail.com");
 
-			Collections.sort(commitDeveloper, new Comparator<RevCommit>() {
-				public int compare(RevCommit o1, RevCommit o2) {
-					return o1.getAuthorIdent().getTimeZoneOffset() - o2.getAuthorIdent().getTimeZoneOffset();
-				}
-			});
-			
-			RevCommit prRevCommit = null;
-			if(commitDeveloper.size() > 0) {
-				 prRevCommit = getPreviousCommit(commits, commitDeveloper.get(Constants.CONSTANT_ZERO));
-			}
-			if(prRevCommit != null) {				
-				commitDeveloper.add(0, prRevCommit);
-			}
-
-			List<String> linesChange = new ArrayList<>();	
+			List<String> linesChange = new ArrayList<>();
 			for (RevCommit revCommit : commitDeveloper) {
-				RevCommit nextCommit = getNextCommit(commitDeveloper, revCommit);
+				RevCommit nextCommit = Util.getNextCommit(commitDeveloper, revCommit);
 				ObjectId commitIdOld = revCommit.getId();
-				LocalDateTime commitDate = revCommit.getAuthorIdent()
-						.getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-				System.out.println(commitDate);
 				ObjectId commitIdNew = nextCommit != null ? nextCommit.getId() : revCommit.getId();
-				//System.out.println(diff(git, commitIdOld.name(), commitIdNew.name(), fileName));
-				linesChange.add(diff(git, commitIdOld.name(), commitIdNew.name(), fileName));
-
+				String diff = diff(commitIdOld.name(), commitIdNew.name(), fileName);
+				if (!diff.equals("")) {
+					linesChange.add(linesAdd(diff));
+				}
 			}
-			setLOCChanges(linesChange, developer, commitDeveloper.size()-1, fileName);
-		} catch (RevisionSyntaxException  e) {
+
+			setLOCChanges(linesChange, developer, commitDeveloper.size() - 1, fileName);
+			Collections.sort(locPerFiles);
+		} catch (RevisionSyntaxException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public RevCommit getNextCommit(List<RevCommit> commits, RevCommit commitNext) {
-		int idx = commits.indexOf(commitNext);
-		if (idx < 0 || idx + 1 == commits.size())
-			return null;
-		return commits.get(idx + 1);
-	}
-	
-	public RevCommit getPreviousCommit(List<RevCommit> commits, RevCommit commitActual){
-		int idx = commits.indexOf(commitActual);
-		if (idx >= 0 || idx -1 == commits.size())
-			return null;
-		return commits.get(idx - 1);
 	}
 
 	public void setLOCChanges(List<String> diffs, Developer dev, Integer qtCommits, String fileName) {
@@ -220,7 +123,6 @@ public class MeasurePerLine extends Measure {
 			sumLinesAdd += Integer.parseInt(lChange[0]);
 			sumLinesDel += Integer.parseInt(lChange[1]);
 		}
-
 		locPerFiles.add(new LOCPerFile(dev, fileName, qtCommits, sumLinesAdd, sumLinesDel));
 	}
 
@@ -237,6 +139,44 @@ public class MeasurePerLine extends Measure {
 	 */
 	public void setLocPerFiles(List<LOCPerFile> locPerFiles) {
 		this.locPerFiles = locPerFiles;
+	}
+
+	private String linesAdd(String diff) {
+		Integer linesAdd = 0;
+		Integer linesDel = 0;
+		String[] lines = diff.split("\n");
+		for (int i = Constants.INDEX_DIFF_DESCARTE; i < lines.length; i++) {
+			String line = lines[i];
+			if (!line.startsWith(Constants.IGNORE_DIFF_INITIAL_CHANGE_PLUS)
+					&& !line.startsWith(Constants.IGNORE_DIFF_INITIAL_CHANGE_MINUS)
+					&& !line.startsWith(Constants.IGNORE_DIFF_INITIAL_CHANGE_AT)
+					&& !line.startsWith(Constants.IGNORE_DIFF_INITIAL_CHANGE_INDEX)) {
+
+				if (line.startsWith("+")) {
+					linesAdd++;
+				}
+
+				if (line.startsWith("-")) {
+					linesDel++;
+				}
+			}
+
+		}
+		return linesAdd + ";" + linesDel;
+	}
+
+	/**
+	 * @return the git
+	 */
+	public Git getGit() {
+		return git;
+	}
+
+	/**
+	 * @param git the git to set
+	 */
+	public void setGit(Git git) {
+		this.git = git;
 	}
 
 }

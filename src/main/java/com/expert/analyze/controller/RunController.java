@@ -11,6 +11,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.expert.analyze.model.ConfigCredential;
 import com.expert.analyze.model.ConfigProperties;
+import com.expert.analyze.model.Developer;
+import com.expert.analyze.model.LOCPerFile;
 import com.expert.analyze.model.git.MeasurePerCommit;
 import com.expert.analyze.model.git.MeasurePerFile;
 import com.expert.analyze.model.git.MeasurePerLine;
@@ -39,7 +41,9 @@ public class RunController {
 		if (configProperties.getMeasureCommit()) {
 			measurePerCommitAllProject();
 			measurePerFile();
-			
+		}
+		if(configProperties.getMeasureLoc()){
+			measurePerLineChange();
 		}
 	}
 
@@ -118,15 +122,15 @@ public class RunController {
 
 		MeasurePerLine mpl;
 		try {
-			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
-			String fileName = "teste";
-			if (!Validador.isStringEmpty(fileName)) {
-//				mpl.linesChangeInFile(repositorio.getRepositoryGit().getLocal(),
-//						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
-//						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\");
-//				mpl.showChangeFilePerAllDevelopers(repositorio.getRepositoryGit().getLocal(),
-//						repositorio.getRepositoryGit().getCommitsLocal(), fileName,
-//						Constants.PATH_DEFAULT + configProperties.getConfigCredential().getNameProject() + "\\", repositorio.getRepositoryGit().getTeamDeveloper());
+			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(), repositorio.getRepositoryGit().getLocal());
+			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
+				for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
+					mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
+				}
+			}
+			
+			for (LOCPerFile loc : mpl.getLocPerFiles()) {
+				System.out.println(loc);
 			}
 
 		} catch (IOException e) {

@@ -1,8 +1,12 @@
 package com.expert.analyze.util;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import com.expert.analyze.model.Developer;
 
@@ -57,5 +61,27 @@ public class Util {
 		String input = sc.nextLine();
 		System.out.println("\n");
 		return input;
+	}
+	
+	public static void sortCommits(List<RevCommit> commits){
+		Collections.sort(commits, new Comparator<RevCommit>() {
+			public int compare(RevCommit o1, RevCommit o2) {
+				return o1.getAuthorIdent().getTimeZoneOffset() - o2.getAuthorIdent().getTimeZoneOffset();
+			}
+		});
+	}
+	
+	public static RevCommit getNextCommit(List<RevCommit> commits, RevCommit commitNext) {
+		int idx = commits.indexOf(commitNext);
+		if (idx < 0 || idx + 1 == commits.size())
+			return null;
+		return commits.get(idx + 1);
+	}
+
+	public static RevCommit getPreviousCommit(List<RevCommit> commits, RevCommit commitActual) {
+		int idx = commits.indexOf(commitActual);
+		if (idx <= 0 || idx - 1 == commits.size())
+			return null;
+		return commits.get(idx - 1);
 	}
 }

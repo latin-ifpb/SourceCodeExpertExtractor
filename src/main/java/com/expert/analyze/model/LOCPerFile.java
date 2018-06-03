@@ -1,6 +1,6 @@
 package com.expert.analyze.model;
 
-public class LOCPerFile {
+public class LOCPerFile implements Comparable<LOCPerFile> {
 	private String fileName;
 	private Integer quantityCommit;
 	private Integer quantityLOCAdd;
@@ -80,7 +80,7 @@ public class LOCPerFile {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
@@ -88,6 +88,66 @@ public class LOCPerFile {
 	public String toString() {
 		return "LOCPerFile [fileName=" + fileName + ", quantityCommit=" + quantityCommit + ", quantityLOCAdd="
 				+ quantityLOCAdd + ", quantityLOCDel=" + quantityLOCDel + ", developer=" + developer + "]";
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((developer == null) ? 0 : developer.hashCode());
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + ((quantityCommit == null) ? 0 : quantityCommit.hashCode());
+		result = prime * result + ((quantityLOCAdd == null) ? 0 : quantityLOCAdd.hashCode());
+		result = prime * result + ((quantityLOCDel == null) ? 0 : quantityLOCDel.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LOCPerFile other = (LOCPerFile) obj;
+		if (developer == null) {
+			if (other.developer != null)
+				return false;
+		} else if (!developer.equals(other.developer))
+			return false;
+		if (fileName == null) {
+			if (other.fileName != null)
+				return false;
+		} else if (!fileName.equals(other.fileName))
+			return false;
+		if (quantityCommit == null) {
+			if (other.quantityCommit != null)
+				return false;
+		} else if (!quantityCommit.equals(other.quantityCommit))
+			return false;
+		if (quantityLOCAdd == null) {
+			if (other.quantityLOCAdd != null)
+				return false;
+		} else if (!quantityLOCAdd.equals(other.quantityLOCAdd))
+			return false;
+		if (quantityLOCDel == null) {
+			if (other.quantityLOCDel != null)
+				return false;
+		} else if (!quantityLOCDel.equals(other.quantityLOCDel))
+			return false;
+		return true;
+	}
+
+	@Override
+	public int compareTo(LOCPerFile o) {
+		 return this.getFileName().compareTo(o.getFileName());
 	}
 	
 }

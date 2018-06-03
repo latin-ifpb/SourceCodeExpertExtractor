@@ -230,6 +230,7 @@ public class RepositoryGitController {
 			}
 			//Set a list the commit for use in measures
 			repositoryGit.setCommitsLocal(commitsLocal);
+			
 		} catch (GitAPIException | IOException e) {
 			e.printStackTrace();
 		}

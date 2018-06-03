@@ -17,8 +17,8 @@ public class Run {
 	static ConfigProperties configProperties = new ConfigProperties();
 	
 	public static void main(String[] args) {
-		String teste = "-prop C:\\Users\\wemerson\\Desktop\\analyzer_expert.properties -mc -ml -mk --t -ti 01/05/2015 -tf 27/06/2015";
-		args = teste.split(" ");
+		//String teste = "-prop C:\\Users\\wemerson\\Desktop\\analyzer_expert.properties -mc -ml -mk";
+		//args = teste.split(" ");
 		System.out.println("\n\n");
 		System.out.println(Constants.NAME_PROJECT);
 		System.out.println("\n");
@@ -33,8 +33,10 @@ public class Run {
 		}
 
 		verifyParameters(argsList);
-		if (configProperties.getTimes()) {
+		if (configProperties.getTimes() != null && configProperties.getTimes()) {
 			verifyTimes(argsList);
+		}else {
+			configProperties.setTimes(Boolean.FALSE);
 		}
 		
 		RunController run = new RunController(configProperties);

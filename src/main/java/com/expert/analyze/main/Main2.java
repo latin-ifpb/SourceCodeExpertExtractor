@@ -2,8 +2,6 @@ package com.expert.analyze.main;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Scanner;
 
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -13,6 +11,7 @@ import com.expert.analyze.controller.DeveloperController;
 import com.expert.analyze.controller.RepositoryGitController;
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.model.LOCPerFile;
+import com.expert.analyze.model.git.MeasuarePerDOK;
 import com.expert.analyze.model.git.MeasurePerFile;
 import com.expert.analyze.model.git.MeasurePerLine;
 import com.expert.analyze.util.Constants;
@@ -31,7 +30,10 @@ public class Main2 {
 		// 05, 01));
 		// teste();
 
+		
 		testeLOC();
+		
+		//testeDOK();
 	}
 
 	private static void repositorioInit() {
@@ -43,7 +45,8 @@ public class Main2 {
 		}
 
 		try {
-			String branch = repositorio.getBranchesRemote().get(Constants.CONSTANT_ZERO);
+			String branch = repositorio.getBranchesRemote().get(1);
+			
 			if (Validador.isDirectoryExist(new File(Constants.PATH_DEFAULT + projectTeste))) {
 				System.out.println("Clonando o	 repositório, Aguarde pode demorar um pouco....");
 				if (repositorio.cloneRepositoryWithOutAuthentication(linkTeste, projectTeste, branch)) {
@@ -54,6 +57,8 @@ public class Main2 {
 			repositorio.loadFilesProject();
 			repositorio.loadTeamDeveloper();
 			System.out.println("Branch Local" + repositorio.getBranchesLocal());
+			System.out.println("Commits" + repositorio.getRepositoryGit().getCommitsLocal().size());
+			System.out.println("Files" + repositorio.getRepositoryGit().getFilesProject().size());
 
 			// repositorio.clonneRepositoryWithAuthentication(repositPrivate,"privateRepositoy",null,
 			// "wemersonthayne22","w3m3450n@");
@@ -100,21 +105,22 @@ public class Main2 {
 		MeasurePerLine mpl;
 
 		try {
-			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
-			for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
+			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(), repositorio.getRepositoryGit().getLocal());
 				for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
-					mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
-							fileName, dev);
+					for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
+						mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
+					}
 				}
-			}
 			
-//			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
+			//mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
 //			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
 //				System.out.println("Dev:"+dev.getName());
-//				mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
-//						"src/br/edu/popjudge/bean/UsuarioBean.java", dev);
+//				mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
+//						"src/br/edu/popjudge/bean/UserBean.java", dev);
 //			}
 
+//			mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
+//					"src/br/edu/popjudge/bean/UsuarioBean.java", null);
 			for (LOCPerFile loc : mpl.getLocPerFiles()) {
 				System.out.println(loc);
 			}
@@ -123,6 +129,18 @@ public class Main2 {
 			e.printStackTrace();
 		}
 
+	}
+	
+	private static void testeDOK(){
+		try {
+			MeasuarePerDOK mpd = new MeasuarePerDOK(repositorio.getRepositoryGit().getLocal().getRepository(),repositorio.getRepositoryGit().getLocal());
+			
+			mpd.addDegree(repositorio.getRepositoryGit().getCommitsLocal(), repositorio.getRepositoryGit().getTeamDeveloper());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 }
