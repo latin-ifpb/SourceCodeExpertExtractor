@@ -83,6 +83,7 @@ public class MeasurePerFile extends Measure {
 			//Add a quantity the commit in file that developer
 			commitsQuantity.add(evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
 			developers.add(developer);
+			System.out.println(commitsQuantity);
 			//build matrix 
 			matrixFileDevelopersPerCommits.add(new FileDeveloper(file, developers, commitsQuantity));
 		}
@@ -105,8 +106,10 @@ public class MeasurePerFile extends Measure {
 				//Add a quantity the commit in file that developer
 				commitsQuantity.add(evaluateQuantityCommitPerFilePerDeveloper(commitsLocal, file, developer));
 			}
-			//build matrix 
-			matrixFileDevelopersPerCommits.add(new FileDeveloper(file, developers, commitsQuantity));
+			//build matrix
+			FileDeveloper fd = new FileDeveloper(file, developers, commitsQuantity);
+			System.out.println(fd.getFile()+":"+fd.getCommits());
+			matrixFileDevelopersPerCommits.add(fd);
 		}
 	}
 

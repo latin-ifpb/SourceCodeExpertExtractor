@@ -4,7 +4,7 @@
   <class id="1" language="java" name="com.expert.analyze.controller.RunController" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/controller/RunController.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="467" y="146"/>    
+    <position height="-1" width="-1" x="670" y="151"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
@@ -13,7 +13,7 @@
   </class>  
   <class id="2" language="java" name="com.expert.analyze.model.Developer" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/Developer.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="1174" y="1637"/>    
+    <position height="-1" width="-1" x="1197" y="1401"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
@@ -42,7 +42,7 @@
   <class id="5" language="java" name="com.expert.analyze.model.ConfigProperties" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/ConfigProperties.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="513" width="230" x="42" y="356"/>    
+    <position height="-1" width="-1" x="557" y="597"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
@@ -59,26 +59,16 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="7" language="java" name="com.expert.analyze.model.ConfigCredential" project="expertanalyzer" 
-    file="/expertanalyzer/src/main/java/com/expert/analyze/model/ConfigCredential.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="153" y="1158"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="8" language="java" name="com.expert.analyze.model.LOCPerFile" project="expertanalyzer" 
+  <class id="7" language="java" name="com.expert.analyze.model.LOCPerFile" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/LOCPerFile.java" binary="false" corner="BOTTOM_RIGHT">    
-    <position height="405" width="272" x="1039" y="909"/>    
+    <position height="-1" width="-1" x="1171" y="895"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="9" language="java" name="com.expert.analyze.model.git.MeasurePerCommit" project="expertanalyzer" 
+  <class id="8" language="java" name="com.expert.analyze.model.git.MeasurePerCommit" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/git/MeasurePerCommit.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="407" width="260" x="740" y="356"/>    
@@ -88,17 +78,7 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="10" language="java" name="com.expert.analyze.controller.RepositoryGitController" project="expertanalyzer" 
-    file="/expertanalyzer/src/main/java/com/expert/analyze/controller/RepositoryGitController.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="315" width="388" x="312" y="356"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="11" language="java" name="com.expert.analyze.model.git.MeasurePerLine" project="expertanalyzer" 
+  <class id="9" language="java" name="com.expert.analyze.model.git.MeasurePerLine" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/git/MeasurePerLine.java" binary="false" 
     corner="BOTTOM_RIGHT">    
     <position height="261" width="271" x="1040" y="356"/>    
@@ -108,165 +88,153 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="12" language="java" name="com.expert.analyze.model.FileDeveloper" project="expertanalyzer" 
+  <class id="10" language="java" name="com.expert.analyze.model.FileDeveloper" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/FileDeveloper.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="261" width="272" x="1598" y="909"/>    
+    <position height="-1" width="-1" x="1764" y="831"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="13" language="java" name="com.expert.analyze.model.git.RepositoryGit" project="expertanalyzer" 
-    file="/expertanalyzer/src/main/java/com/expert/analyze/model/git/RepositoryGit.java" binary="false" 
-    corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="863" y="1106"/>    
-    <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
-      sort-features="false" accessors="true" visibility="true">      
-      <attributes public="true" package="false" protected="true" private="true" static="true"/>      
-      <operations public="true" package="true" protected="true" private="true" static="true"/>    
-    </display>  
-  </class>  
-  <class id="14" language="java" name="com.expert.analyze.controller.DeveloperController" project="expertanalyzer" 
+  <class id="11" language="java" name="com.expert.analyze.controller.DeveloperController" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/controller/DeveloperController.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="-1" width="-1" x="456" y="1062"/>    
+    <position height="-1" width="-1" x="846" y="972"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="15" language="java" name="com.expert.analyze.model.DegreeKnowledgeFile" project="expertanalyzer" 
+  <class id="12" language="java" name="com.expert.analyze.model.DegreeKnowledgeFile" project="expertanalyzer" 
     file="/expertanalyzer/src/main/java/com/expert/analyze/model/DegreeKnowledgeFile.java" binary="false" 
     corner="BOTTOM_RIGHT">    
-    <position height="405" width="207" x="1351" y="909"/>    
+    <position height="-1" width="-1" x="1485" y="847"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
       sort-features="false" accessors="true" visibility="true">      
       <attributes public="true" package="false" protected="true" private="true" static="true"/>      
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <association id="16">    
-    <end type="SOURCE" refId="13" navigable="false">      
-      <attribute id="17" name="teamDeveloper"/>      
-      <multiplicity id="18" minimum="0" maximum="2147483647"/>    
+  <association id="13">    
+    <bendpoint x="487" y="283"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="14" name="configProperties">        
+        <position height="18" width="87" x="566" y="307"/>      
+      </attribute>      
+      <multiplicity id="15" minimum="0" maximum="1">        
+        <position height="0" width="0" x="400" y="-15"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <generalization id="16">    
+    <bendpoint x="1565" y="208"/>    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="17">    
+    <bendpoint x="1057" y="243"/>    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="18">    
+    <end type="SOURCE" refId="6"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <association id="19">    
+    <end type="SOURCE" refId="9" navigable="false">      
+      <attribute id="20" name="locPerFiles">        
+        <position height="0" width="0" x="-4" y="-216"/>      
+      </attribute>      
+      <multiplicity id="21" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="-4" y="-216"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="22">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="23" name="developer">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </attribute>      
+      <multiplicity id="24" minimum="0" maximum="1">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="19">    
-    <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="20" name="degreeKnows"/>      
-      <multiplicity id="21" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="15" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="22">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="23" name="matrixFileDevelopersPerCommits"/>      
-      <multiplicity id="24" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="12" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
   <association id="25">    
-    <end type="SOURCE" refId="8" navigable="false">      
-      <attribute id="26" name="developer"/>      
-      <multiplicity id="27" minimum="0" maximum="1"/>    
+    <bendpoint x="1571" y="1342"/>    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="26" name="developers">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </attribute>      
+      <multiplicity id="27" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="28">    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="29" name="locPerFiles"/>      
-      <multiplicity id="30" minimum="0" maximum="2147483647"/>    
+    <end type="SOURCE" refId="12" navigable="false">      
+      <attribute id="29" name="developer">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </attribute>      
+      <multiplicity id="30" minimum="0" maximum="1">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </multiplicity>    
     </end>    
-    <end type="TARGET" refId="8" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="31">    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="32" name="repositorio"/>      
-      <multiplicity id="33" minimum="0" maximum="1"/>    
+    <bendpoint x="926" y="1243"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="32" name="teamDeveloper">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </attribute>      
+      <multiplicity id="33" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="23" y="-236"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="34">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="35" name="degreeKnows">        
+        <position height="0" width="0" x="31" y="-264"/>      
+      </attribute>      
+      <multiplicity id="36" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="31" y="-264"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="37">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="38" name="matrixFileDevelopersPerCommits">        
+        <position height="0" width="0" x="30" y="-208"/>      
+      </attribute>      
+      <multiplicity id="39" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="30" y="-208"/>      
+      </multiplicity>    
     </end>    
     <end type="TARGET" refId="10" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="34">    
-    <end type="SOURCE" refId="5" navigable="false">      
-      <attribute id="35" name="configCredential"/>      
-      <multiplicity id="36" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="7" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="37">    
-    <bendpoint x="268" y="306"/>    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="38" name="configProperties">        
-        <position height="18" width="87" x="166" y="322"/>      
-      </attribute>      
-      <multiplicity id="39" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="40">    
-    <bendpoint x="685" y="1392"/>    
-    <end type="SOURCE" refId="14" navigable="false">      
-      <attribute id="41" name="teamDeveloper"/>      
-      <multiplicity id="42" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="43">    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="44" name="repositoryGit"/>      
-      <multiplicity id="45" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="13" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="46">    
-    <bendpoint x="1571" y="1342"/>    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="47" name="developers"/>      
-      <multiplicity id="48" minimum="0" maximum="2147483647"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <generalization id="49">    
-    <bendpoint x="1565" y="208"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <generalization id="50">    
-    <bendpoint x="1057" y="243"/>    
+  <generalization id="40">    
     <end type="SOURCE" refId="9"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
-  <generalization id="51">    
-    <end type="SOURCE" refId="11"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <generalization id="52">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <association id="53">    
-    <end type="SOURCE" refId="15" navigable="false">      
-      <attribute id="54" name="developer"/>      
-      <multiplicity id="55" minimum="0" maximum="1"/>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
     sort-features="false" accessors="true" visibility="true">    
     <attributes public="true" package="true" protected="true" private="true" static="true"/>    

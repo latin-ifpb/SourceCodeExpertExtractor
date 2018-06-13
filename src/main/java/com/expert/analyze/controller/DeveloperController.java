@@ -40,6 +40,8 @@ public class DeveloperController {
 			 String normalize = mountDeveloperNormalize(findDevelopers);
 			 //Verify exit item in list
 			 if(!teamDeveloperNormalize.contains(normalize)){
+				 //TODO:retirar
+				 System.out.println(normalize);
 				 teamDeveloperNormalize.add(normalize);
 			 }
 		});

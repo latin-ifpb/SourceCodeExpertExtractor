@@ -17,7 +17,7 @@ public class Run {
 	static ConfigProperties configProperties = new ConfigProperties();
 	
 	public static void main(String[] args) {
-		//String teste = "-prop C:\\Users\\wemerson\\Desktop\\analyzer_expert.properties -mc -ml -mk";
+		//String teste = "-prop C:\\Users\\wemerson\\Desktop\\analyzer_expert.properties -ml --t -ti 01/01/2018 -tf 01/06/2018";
 		//args = teste.split(" ");
 		System.out.println("\n\n");
 		System.out.println(Constants.NAME_PROJECT);

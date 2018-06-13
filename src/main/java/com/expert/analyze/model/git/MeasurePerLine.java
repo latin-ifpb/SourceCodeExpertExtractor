@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
@@ -65,6 +66,7 @@ public class MeasurePerLine extends Measure {
 				df.format(entry);
 				entry.getOldId();
 				diffText += out.toString("UTF-8");
+				
 			}
 
 		} catch (IOException | GitAPIException e) {
@@ -178,5 +180,45 @@ public class MeasurePerLine extends Measure {
 	public void setGit(Git git) {
 		this.git = git;
 	}
+	
+	public List<String> printLineChangePerFile(Set<Developer> developers){
+		Set<String> data = new TreeSet<>();
 
+		for (LOCPerFile loc : locPerFiles) {
+			StringBuilder item = new StringBuilder();			
+			List<LOCPerFile> findLOCS = locPerFiles.stream()                // convert list to stream
+	                .filter(line -> line.getFileName().equalsIgnoreCase(loc.getFileName()))//when developer equal email his add in list
+	                .collect(Collectors.toList());
+		
+			item.append(loc.getFileName());
+			
+			findLOCS.forEach(f ->{
+				item.append(";");
+				item.append((f.getQuantityLOCAdd() +f.getQuantityLOCDel()));
+			});
+			//System.out.println(item);
+//			if(data.contains(item.toString())) {				
+				data.add(item.toString());
+//			}
+		}
+		
+		StringBuilder sb = new StringBuilder(";");
+		developers.forEach(d ->{			
+			sb.append(d.getName());
+			sb.append(";");
+		});
+		
+		List<String> dataExport = new ArrayList<>();
+		dataExport.add(0, sb.toString());
+		
+		data.forEach(d -> {
+			System.out.println(d);
+			dataExport.add(d);
+		});
+		return dataExport;
+	}
+	
+	
 }
+
+

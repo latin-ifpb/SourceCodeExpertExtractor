@@ -1,6 +1,7 @@
 package com.expert.analyze.model;
 
 public class LOCPerFile implements Comparable<LOCPerFile> {
+	
 	private String fileName;
 	private Integer quantityCommit;
 	private Integer quantityLOCAdd;

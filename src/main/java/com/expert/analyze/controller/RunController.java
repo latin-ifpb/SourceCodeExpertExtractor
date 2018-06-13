@@ -3,6 +3,7 @@ package com.expert.analyze.controller;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -34,15 +35,16 @@ public class RunController {
 	}
 
 	public void initRun() {
+		System.out.println("Iniciando o processo de extrações de contribuições.....");
 		repositorioInit(configProperties.getConfigCredential());
 		if (configProperties.getTimes()) {
 			queryCommitPerDate(configProperties.getDateInitial(), configProperties.getDateFinal());
 		}
-		if (configProperties.getMeasureCommit()) {
+		if (configProperties.getMeasureCommit() != null && configProperties.getMeasureCommit()) {
 			measurePerCommitAllProject();
 			measurePerFile();
 		}
-		if(configProperties.getMeasureLoc()){
+		if(configProperties.getMeasureLoc()!= null && configProperties.getMeasureLoc()){
 			measurePerLineChange();
 		}
 	}
@@ -52,7 +54,7 @@ public class RunController {
 		if (!Validador.isStringEmpty(credential.getNameProject())
 				&& !Validador.isStringEmpty(credential.getLinkProject())) {
 			repositorio.getRepositoryGit().setLinkProjectLocal(Constants.PATH_DEFAULT + credential.getNameProject());
-			repositorio.getRepositoryGit().setLinkProjectRemote(credential.getLinkProject());
+			//repositorio.getRepositoryGit().setLinkProjectRemote(credential.getLinkProject());
 		}
 		try {
 			if (Validador.isDirectoryExist(new File(Constants.PATH_DEFAULT + credential.getNameProject()))) {
@@ -73,13 +75,14 @@ public class RunController {
 			repositorio.loadCommitsLocal();
 			repositorio.loadFilesProject();
 			repositorio.loadTeamDeveloper();
-
+			//TODO:retirar
+			System.out.println("Normalizando os contribuidores do projeto");
 			// Normalize team developer
 			DeveloperController dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
 			dc.contributorsNormalizere();
-			System.out.println("Exportando contribuidores....");
-			dc.exportContributorsNormalizeInTXT(Constants.PATH_DEFAULT_REPORT);
 			
+			System.out.println("Exportando contribuidores....");
+			dc.exportContributorsNormalizeInTXT(Constants.PATH_DEFAULT_REPORT+configProperties.getConfigCredential().getNameProject());
 			repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
 			
 		} catch (TransportException e) {
@@ -96,6 +99,10 @@ public class RunController {
 
 		measurePerCommit.developerPerCommits(repositorio.getRepositoryGit().getCommitsLocal(),repositorio.getRepositoryGit().getTeamDeveloper());
 		measurePerCommit.showEvaluateDeveloperPerCommit(repositorio.getRepositoryGit());
+		//TODO:retirar
+		BuildReport b = new BuildReport();
+		b.buildReportCSV(Constants.PATH_DEFAULT_REPORT +configProperties.getConfigCredential().getNameProject()+"CommitAllProject-"
+				+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), measurePerCommit.getDataCSV());
 
 	}
 	
@@ -108,7 +115,8 @@ public class RunController {
 					repositorio.getRepositoryGit().getTeamDeveloper());
 			
 			BuildReport b = new BuildReport();
-			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + configProperties.getConfigCredential().getNameProject(), mpf.printFileDeveloper());
+			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + configProperties.getConfigCredential().getNameProject()+
+					"COMIT_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), mpf.printFileDeveloper());
 			System.out.println("Matriz gerada com sucesso.....");
 		} catch (IOException e) {
 			System.err.println("Error ao tentar gerar metrica por arquivo:"+e.getMessage());
@@ -129,9 +137,9 @@ public class RunController {
 				}
 			}
 			
-			for (LOCPerFile loc : mpl.getLocPerFiles()) {
-				System.out.println(loc);
-			}
+			BuildReport b = new BuildReport();
+			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + configProperties.getConfigCredential().getNameProject()+
+					"LOC_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), mpl.printLineChangePerFile(repositorio.getRepositoryGit().getTeamDeveloper()));
 
 		} catch (IOException e) {
 			System.err.println(e.getMessage());

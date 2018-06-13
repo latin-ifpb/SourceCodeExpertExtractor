@@ -66,7 +66,6 @@ public class MeasurePerCommit extends Measure {
 		for (Developer developer : teamDev) {
 			commitsPerDeveloper.put(developer, countCommitPerDeveloper(commits, developer));
 		}
-
 		setDevPerCommits(commitsPerDeveloper);
 		return commitsPerDeveloper;
 	}
@@ -76,15 +75,18 @@ public class MeasurePerCommit extends Measure {
 	 * @param repository
 	 */
 	public void showEvaluateDeveloperPerCommit(RepositoryGit repository){
+		System.out.println("+---------------------------------------------------------------------+");
+		System.out.println("|     Developer     |       Commit 		|      Porcentagem      |");
+		System.out.println("+---------------------------------------------------------------------+");
 		repository.getTeamDeveloper().iterator().forEachRemaining(dev -> {
 			int total = 0;
 			total = countCommitPerDeveloper(repository.getCommitsLocal(), dev);
-			System.out.println("Developer: " + dev.getName() + " has Commit: " + total + " Percente:"+ evaluatePercentageCommitsAllProjectPerDeveloper(repository.getQuantityCommitLocal(), total));
+			System.out.println("Developer: " + dev.getName() + " Commit: " + total + " Porcentagem:"+ evaluatePercentageCommitsAllProjectPerDeveloper(repository.getQuantityCommitLocal(), total));
 			//Export Datas
 			data.add("Developer: " + dev.getName() + " has Commit: " + total + " Percente:"+ evaluatePercentageCommitsAllProjectPerDeveloper(repository.getQuantityCommitLocal(), total));
 			dataCSV.add(dev.getName() + ";" + total + ";"+ evaluatePercentageCommitsAllProjectPerDeveloper(repository.getQuantityCommitLocal(), total));
-
 		});
+		System.out.println("+---------------------------------------------------------------------+");
 	}
 
 	/**
