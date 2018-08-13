@@ -1,16 +1,16 @@
 package com.expert.analyze.model.git;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -18,9 +18,13 @@ import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.RawTextComparator;
 import org.eclipse.jgit.errors.RevisionSyntaxException;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
+import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 
 import com.expert.analyze.model.Developer;
@@ -62,11 +66,9 @@ public class MeasurePerLine extends Measure {
 			df.setDiffComparator(RawTextComparator.DEFAULT);
 
 			for (DiffEntry entry : diffs) {
-				// System.out.println(entry.getChangeType());
 				df.format(entry);
 				entry.getOldId();
 				diffText += out.toString("UTF-8");
-				
 			}
 
 		} catch (IOException | GitAPIException e) {
@@ -77,12 +79,14 @@ public class MeasurePerLine extends Measure {
 	}
 
 
-	public void resolveCommitsPerDeveloper(Git git, List<RevCommit> commits, String fileName, Developer developer) {
+	public void resolveCommitsPerDeveloper(List<RevCommit> commits, String fileName, Developer developer) {
+		//Developer dev = new Developer("Daniel","rerissondaniel@gmail.com");
 		List<RevCommit> commitDeveloper = commits.stream()
 				.filter(commit -> (commit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(developer.getEmail())
 						&& Validador.isFileExistInCommit(commit, getRepository(), fileName)))
 				.collect(Collectors.toList());
 		Util.sortCommits(commitDeveloper);
+		
 		RevCommit prRevCommit = null;
 		if (commitDeveloper.size() > 0) {
 			prRevCommit = Util.getPreviousCommit(commits, commitDeveloper.get(Constants.CONSTANT_ZERO));
@@ -90,15 +94,14 @@ public class MeasurePerLine extends Measure {
 		if (prRevCommit != null) {
 			commitDeveloper.add(0, prRevCommit);
 		}
-
-		linesChangePerFile(git, commitDeveloper, fileName, developer);
+		linesChangePerFile(commitDeveloper, fileName, developer);
 	}
 
-	public void linesChangePerFile(Git git, List<RevCommit> commitDeveloper, String fileName, Developer developer) {
-		int currentLines = 0;
+	public void linesChangePerFile(List<RevCommit> commitDeveloper, String fileName, Developer developer) {
 		try {
-			// //Developer dev = new Developer("Daniel","rerissondaniel@gmail.com");
-
+			
+			Collections.reverse(commitDeveloper);
+			
 			List<String> linesChange = new ArrayList<>();
 			for (RevCommit revCommit : commitDeveloper) {
 				RevCommit nextCommit = Util.getNextCommit(commitDeveloper, revCommit);
@@ -108,6 +111,7 @@ public class MeasurePerLine extends Measure {
 				if (!diff.equals("")) {
 					linesChange.add(linesAdd(diff));
 				}
+				//System.out.println(diff);
 			}
 
 			setLOCChanges(linesChange, developer, commitDeveloper.size() - 1, fileName);
@@ -186,20 +190,18 @@ public class MeasurePerLine extends Measure {
 
 		for (LOCPerFile loc : locPerFiles) {
 			StringBuilder item = new StringBuilder();			
-			List<LOCPerFile> findLOCS = locPerFiles.stream()                // convert list to stream
-	                .filter(line -> line.getFileName().equalsIgnoreCase(loc.getFileName()))//when developer equal email his add in list
+			List<LOCPerFile> findLOCS = locPerFiles.stream()               
+	                .filter(line -> line.getFileName().equalsIgnoreCase(loc.getFileName()))
 	                .collect(Collectors.toList());
 		
 			item.append(loc.getFileName());
 			
 			findLOCS.forEach(f ->{
 				item.append(";");
-				item.append((f.getQuantityLOCAdd() +f.getQuantityLOCDel()));
+				item.append((f.getQuantityLOCAdd() + f.getQuantityLOCDel()));
 			});
-			//System.out.println(item);
-//			if(data.contains(item.toString())) {				
+			
 				data.add(item.toString());
-//			}
 		}
 		
 		StringBuilder sb = new StringBuilder(";");
@@ -218,7 +220,102 @@ public class MeasurePerLine extends Measure {
 		return dataExport;
 	}
 	
+	public void teste(List<RevCommit> commits, String fileName,Set<Developer> developers){
+		List<RevCommit> commitFilter = filterCommitContainsFile(commits,fileName);
+		int d = 0;
+		for (RevCommit revCommit : commitFilter) {
+			RevCommit nextCommit = Util.getNextCommit(commitFilter, revCommit);
+			ObjectId commitIdOld = revCommit.getId();
+			ObjectId commitIdNew = null;
+
+			if(nextCommit != null ) {				
+				commitIdNew = nextCommit.getId();
+			}else {
+				nextCommit = Util.getNextCommit(commits, revCommit);
+				if(nextCommit != null && Validador.isFileExistInCommit(nextCommit, getRepository(), fileName)) {					
+					commitIdNew = nextCommit.getId();
+				}
+			}
+		
+			String diff = diff(commitIdOld.name(), commitIdNew.name(), fileName);
+			if(nextCommit != null && diff.length() > 0){
+				d++;
+				System.out.println("Email: "+revCommit.getAuthorIdent().getEmailAddress());
+				if(revCommit.getAuthorIdent().getEmailAddress().equalsIgnoreCase(nextCommit.getAuthorIdent().getEmailAddress())){
+					//System.out.println("mesmo author");
+				}else {
+					//System.out.println("não é mesmo author");
+				}
+				try {
+					System.out.println("Lines: "+countLinesOfFileInCommit(commitIdOld,fileName));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} 	
+			//System.out.println(diff);
+			System.out.println(d);
+		}
+//		
+//		
+//		if (!diff.equals("")) {
+//			linesChange.add(linesAdd(diff));
+		
+	}
 	
+	private int countLinesOfFileInCommit( ObjectId commitID, String name) throws IOException {
+		try (RevWalk revWalk = new RevWalk(getRepository())) {
+			RevCommit commit = revWalk.parseCommit(commitID);
+			RevTree tree = commit.getTree();
+			System.out.println("Having tree: " + tree);
+
+			// now try to find a specific file
+			try (TreeWalk treeWalk = new TreeWalk(getRepository())) {
+				treeWalk.addTree(tree);
+				treeWalk.setRecursive(true);
+				treeWalk.setFilter(PathFilter.create(name));
+//				if (!treeWalk.next()) {
+//					throw new IllegalStateException("Did not find expected file 'README.md'");
+//				}
+
+				ObjectId objectId = treeWalk.getObjectId(0);
+				ObjectLoader loader = getRepository().open(objectId);
+
+				// load the content of the file into a stream
+				ByteArrayOutputStream stream = new ByteArrayOutputStream();
+				loader.copyTo(stream);
+
+				revWalk.dispose();
+
+				return IOUtils.readLines(new ByteArrayInputStream(stream.toByteArray()), "UTF-8").size();
+			}
+		}
+	}
+	private List<RevCommit> filterCommitContainsFile(List<RevCommit> commits, String fileName){
+		
+		List<RevCommit> commitFilter = commits.stream()
+				.filter(commit -> Validador.isFileExistInCommit(commit, getRepository(), fileName))
+				.collect(Collectors.toList());
+		
+		RevCommit prRevCommit = null;
+		if (commitFilter.size() > 0) {
+			prRevCommit = Util.getPreviousCommit(commits, commitFilter.get(Constants.CONSTANT_ZERO));
+		}
+		if (prRevCommit != null) {
+			commitFilter.add(0, prRevCommit);
+		}
+		
+		Util.sortCommits(commitFilter);
+		Collections.reverse(commitFilter);
+		return commitFilter;
+	}
+	
+
+//	commitFilter.forEach(c ->{
+//		LocalDate commitDate = c.getAuthorIdent()
+//				.getWhen().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//		System.out.println(commitDate);
+//	});
 }
 
 

@@ -3,7 +3,6 @@ package com.expert.analyze.main;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import com.expert.analyze.controller.BuildReport;
 import com.expert.analyze.controller.DeveloperController;
 import com.expert.analyze.controller.RepositoryGitController;
 import com.expert.analyze.model.Developer;
-import com.expert.analyze.model.LOCPerFile;
 import com.expert.analyze.model.git.MeasuarePerDOK;
 import com.expert.analyze.model.git.MeasurePerCommit;
 import com.expert.analyze.model.git.MeasurePerFile;
@@ -32,22 +30,21 @@ public class Main2 {
 
 	private static RepositoryGitController repositorio;
 	//private static String linkTeste = "https://gitlab.dpf.gov.br/mobilizacao/mobilizacao-rest.git";
-	//private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
-	private static String linkTeste = "https://github.com/usebens/amazon.git";
+	private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
+	//private static String linkTeste = "https://github.com/usebens/amazon.git";
 	//private static String projectTeste = "teste_project";
-	private static String projectTeste = "mobilizacao-rest";
+    private static String projectTeste = "mobilizacao-rest";
 	private static String repositPrivate = "https://gitlab.dpf.gov.br/mobilizacao/mobilizacao-rest.git";
 
 	public static void main(String[] args) {
 		repositorioInit();
-		// repositorio.findCommitsPerDate(LocalDate.of(2017, 04, 01), LocalDate.of(2017,
-		// 05, 01));
+		repositorio.findCommitsPerDate(LocalDate.of(2018,01,01), LocalDate.of(2018,01,15));
 		// teste();
 
 		//teste();
 		//testeLOC();
 		
-		//testeDOK();
+		testeDOK();
 	}
 
 	private static void repositorioInit() {
@@ -59,7 +56,7 @@ public class Main2 {
 		}
 
 		//String branch = repositorio.getBranchesRemote().get(1);
-		String branch = "12sprint";
+		String branch = "master";
 
 		if (Validador.isDirectoryExist(new File(Constants.PATH_DEFAULT + projectTeste))) {
 			System.out.println("Clonando o	 repositório, Aguarde pode demorar um pouco....");
@@ -84,22 +81,22 @@ public class Main2 {
 		repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
 		System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
 		
-		queryCommitPerDate("01/01/2018","02/02/2018");
-		repositorio.loadFilesProject();
-		repositorio.loadTeamDeveloper();
+		//queryCommitPerDate("01/01/2018","02/02/2018");
+		//repositorio.loadFilesProject();
+		//repositorio.loadTeamDeveloper();
 		//System.out.println("Branch Local" + repositorio.getBranchesLocal());
-		System.out.println("Commits:" + repositorio.getRepositoryGit().getCommitsLocal().size());
-		System.out.println("Files:" + repositorio.getRepositoryGit().getFilesProject().size());
+		//System.out.println("Commits:" + repositorio.getRepositoryGit().getCommitsLocal().size());
+		//System.out.println("Files:" + repositorio.getRepositoryGit().getFilesProject().size());
 		
 		// Normalize team developer
-		dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
-		dc.contributorsNormalizere();
-		repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
-		System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
+		//dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
+		//dc.contributorsNormalizere();
+		//repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
+		//System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
+		//		repositorio.getRepositoryGit().getTeamDeveloper().forEach(d ->{
+		//		System.out.println(d);
+		//		});
 		
-//		repositorio.getRepositoryGit().getTeamDeveloper().forEach(d ->{
-//			System.out.println(d);
-//		});
 	}
 
 	private static void teste() {
@@ -132,27 +129,32 @@ public class Main2 {
 		MeasurePerLine mpl;
 
 		try {
-			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(), repositorio.getRepositoryGit().getLocal());
-				for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
-					for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
-						mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
-					}
-				}
-				
-				BuildReport b = new BuildReport();
-				b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste+"LOC_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), mpl.printLineChangePerFile(repositorio.getRepositoryGit().getTeamDeveloper()));
-			//mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository());
-//			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
-//				System.out.println("Dev:"+dev.getName());
-//				mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
-//						"src/br/edu/popjudge/bean/UserBean.java", dev);
-//			}
+//			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(), repositorio.getRepositoryGit().getLocal());
+//				for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
+//					for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
+//						mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
+//					}
+//				}
+//				
+//				BuildReport b = new BuildReport();
+//				b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste+"LOC_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), mpl.printLineChangePerFile(repositorio.getRepositoryGit().getTeamDeveloper()));
+			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(),repositorio.getRepositoryGit().getLocal());
+			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
+				System.out.println("Dev:"+dev.getName());
+				mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),
+						"src/br/edu/popjudge/bean/UsuarioBean.java", dev);
+			}
 
-//			mpl.teste(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
-//					"src/br/edu/popjudge/bean/UsuarioBean.java", null);
-//			for (LOCPerFile loc : mpl.getLocPerFiles()) {
-//				System.out.println(loc);
-//			}
+			mpl.getLocPerFiles().forEach(f->{
+				System.out.println(f);
+			});
+//			
+			mpl.teste(repositorio.getRepositoryGit().getCommitsLocal(),
+					"src/br/edu/popjudge/bean/UsuarioBean.java",
+					repositorio.getRepositoryGit().getTeamDeveloper());
+			
+//			mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),
+//					"src/br/edu/popjudge/bean/UserBean.java", repositorio.getRepositoryGit().getTeamDeveloper().iterator().next());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -164,7 +166,11 @@ public class Main2 {
 		try {
 			MeasuarePerDOK mpd = new MeasuarePerDOK(repositorio.getRepositoryGit().getLocal().getRepository(),repositorio.getRepositoryGit().getLocal());
 			
-			mpd.addDegree(repositorio.getRepositoryGit().getCommitsLocal(), repositorio.getRepositoryGit().getTeamDeveloper());
+			mpd.buildMatrizDegree(repositorio.getRepositoryGit().getCommitsLocal(), repositorio.getRepositoryGit().getTeamDeveloper());
+			
+			BuildReport br = new BuildReport();
+			br.buildReportCSV(Constants.PATH_DEFAULT_REPORT + projectTeste, mpd.getDataExport());
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

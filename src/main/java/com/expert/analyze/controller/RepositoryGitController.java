@@ -281,7 +281,7 @@ public class RepositoryGitController {
 				treeWalk.addTree(c.getTree());
 				treeWalk.setRecursive(true);//set walk in all tree
 				while (treeWalk.next()) {
-					//Verify this file is valid, remove files the configuration, proprets, file build for IDE.
+					//Verify this file is valid, remove files the configuration, properties, file build for IDE.
 					if (Validador.isFileValid(treeWalk)) {
 						namesFiles.add(treeWalk.getNameString());
 						filesProject.add(treeWalk.getPathString());
@@ -292,7 +292,7 @@ public class RepositoryGitController {
 			}
 		});
 		
-		// set filepath and filename in repository anlyzer
+		// set filepath and filename in repository analyzer
 		repositoryGit.setFilesProject(filesProject);
 		repositoryGit.setNamesFiles(namesFiles);
 	}

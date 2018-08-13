@@ -66,6 +66,22 @@ public class Validador {
 		return Boolean.FALSE;
 	}
 	
+	public static Boolean isFileValid(String filePath){
+		if(!filePath.contains(Constants.FILES_IGNORE[0])
+				&& !filePath.contains(Constants.FILES_IGNORE[1])
+					&& !filePath.contains(Constants.FILES_IGNORE[2])
+						&& !filePath.contains(Constants.FILES_IGNORE[3])
+							&& !filePath.contains(Constants.FILES_IGNORE[4])
+								&& !filePath.contains(Constants.FILES_IGNORE[5])
+									&& !filePath.contains(Constants.FILES_IGNORE[6])
+									   && !filePath.contains(Constants.FILES_IGNORE[7])
+									   	  && !filePath.contains(Constants.FILES_IGNORE[8])){
+			return Boolean.TRUE;
+		}
+		return Boolean.FALSE;
+	}
+	
+	
 	/**
 	 * Verify this file exist in tree the commit
 	 * @param commit

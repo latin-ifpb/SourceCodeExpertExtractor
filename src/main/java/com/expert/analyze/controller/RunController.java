@@ -13,7 +13,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import com.expert.analyze.model.ConfigCredential;
 import com.expert.analyze.model.ConfigProperties;
 import com.expert.analyze.model.Developer;
-import com.expert.analyze.model.LOCPerFile;
+import com.expert.analyze.model.git.MeasuarePerDOK;
 import com.expert.analyze.model.git.MeasurePerCommit;
 import com.expert.analyze.model.git.MeasurePerFile;
 import com.expert.analyze.model.git.MeasurePerLine;
@@ -46,6 +46,10 @@ public class RunController {
 		}
 		if(configProperties.getMeasureLoc()!= null && configProperties.getMeasureLoc()){
 			measurePerLineChange();
+		}
+		
+		if(configProperties.getMeasureDOK() != null && configProperties.getMeasureDOK()) {
+			measurePerDOK();
 		}
 	}
 
@@ -133,13 +137,31 @@ public class RunController {
 			mpl = new MeasurePerLine(repositorio.getRepositoryGit().getLocal().getRepository(), repositorio.getRepositoryGit().getLocal());
 			for (Developer dev : repositorio.getRepositoryGit().getTeamDeveloper()) {
 				for(String fileName :repositorio.getRepositoryGit().getFilesProject()){				
-					mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getLocal(), repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
+					mpl.resolveCommitsPerDeveloper(repositorio.getRepositoryGit().getCommitsLocal(),fileName, dev);
 				}
 			}
 			
 			BuildReport b = new BuildReport();
 			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + configProperties.getConfigCredential().getNameProject()+
 					"LOC_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(), mpl.printLineChangePerFile(repositorio.getRepositoryGit().getTeamDeveloper()));
+
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+	}
+
+	
+	public  void measurePerDOK() {
+		System.out.println("");
+		System.out.println("--------- MESOURES PER DEGREE KNOLEGDE ----------");
+
+		try {
+			MeasuarePerDOK mpd = new MeasuarePerDOK(repositorio.getRepositoryGit().getLocal().getRepository(),repositorio.getRepositoryGit().getLocal());
+			mpd.buildMatrizDegree(repositorio.getRepositoryGit().getCommitsLocal(), repositorio.getRepositoryGit().getTeamDeveloper());
+			
+			BuildReport b = new BuildReport();
+			b.buildReportCSV(Constants.PATH_DEFAULT_REPORT + configProperties.getConfigCredential().getNameProject()+
+					"DOK_REPORT"+LocalDate.now().toString()+"-"+LocalTime.now().toSecondOfDay(),mpd.getDataExport());
 
 		} catch (IOException e) {
 			System.err.println(e.getMessage());

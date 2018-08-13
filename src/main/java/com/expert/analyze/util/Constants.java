@@ -30,6 +30,7 @@ public class Constants {
 	public static String TIMEFINAL = "-tf";
 	public static int CONST_INDEX = 1;
 	public static String PROP_PROTOCOL = "=";
+	public static String SEPARETOR = ";";
 	
 	
 	public static String NAME_PROJECT ="                          _  _                   ______                           _    _            \r\n" + 

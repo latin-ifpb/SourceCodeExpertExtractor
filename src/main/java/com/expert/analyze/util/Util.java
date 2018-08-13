@@ -84,4 +84,16 @@ public class Util {
 			return null;
 		return commits.get(idx - 1);
 	}
+	
+	public static Developer findDeveloperPerEmail(String email, Set<Developer> developers) {
+		Developer d = developers.stream().filter(dev -> {
+			if (dev.getEmail().equalsIgnoreCase(email)) {
+				return true;
+			} else {
+				return false;
+			}
+		}).findAny().orElse(null);
+		return d;
+	}
+	
 }

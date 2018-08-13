@@ -14,7 +14,6 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import com.expert.analyze.model.Developer;
 import com.expert.analyze.model.FileDeveloper;
-import com.expert.analyze.util.Util;
 import com.expert.analyze.util.Validador;
 
 /**

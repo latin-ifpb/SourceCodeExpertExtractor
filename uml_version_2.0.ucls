@@ -119,32 +119,30 @@
     </display>  
   </class>  
   <association id="13">    
-    <bendpoint x="487" y="283"/>    
-    <end type="SOURCE" refId="1" navigable="false">      
-      <attribute id="14" name="configProperties">        
-        <position height="18" width="87" x="566" y="307"/>      
+    <bendpoint x="1571" y="1342"/>    
+    <end type="SOURCE" refId="10" navigable="false">      
+      <attribute id="14" name="developers">        
+        <position height="0" width="0" x="23" y="-236"/>      
       </attribute>      
-      <multiplicity id="15" minimum="0" maximum="1">        
-        <position height="0" width="0" x="400" y="-15"/>      
+      <multiplicity id="15" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="23" y="-236"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="5" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="16">    
-    <bendpoint x="1565" y="208"/>    
-    <end type="SOURCE" refId="4"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <generalization id="17">    
-    <bendpoint x="1057" y="243"/>    
-    <end type="SOURCE" refId="8"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
-  <generalization id="18">    
-    <end type="SOURCE" refId="6"/>    
-    <end type="TARGET" refId="3"/>  
-  </generalization>  
+  <association id="16">    
+    <end type="SOURCE" refId="4" navigable="false">      
+      <attribute id="17" name="matrixFileDevelopersPerCommits">        
+        <position height="0" width="0" x="30" y="-208"/>      
+      </attribute>      
+      <multiplicity id="18" minimum="0" maximum="2147483647">        
+        <position height="0" width="0" x="30" y="-208"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
   <association id="19">    
     <end type="SOURCE" refId="9" navigable="false">      
       <attribute id="20" name="locPerFiles">        
@@ -157,37 +155,40 @@
     <end type="TARGET" refId="7" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="22">    
-    <end type="SOURCE" refId="7" navigable="false">      
-      <attribute id="23" name="developer">        
-        <position height="0" width="0" x="23" y="-236"/>      
-      </attribute>      
-      <multiplicity id="24" minimum="0" maximum="1">        
-        <position height="0" width="0" x="23" y="-236"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
+  <generalization id="22">    
+    <bendpoint x="1057" y="243"/>    
+    <end type="SOURCE" refId="8"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="23">    
+    <bendpoint x="1565" y="208"/>    
+    <end type="SOURCE" refId="4"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
+  <generalization id="24">    
+    <end type="SOURCE" refId="9"/>    
+    <end type="TARGET" refId="3"/>  
+  </generalization>  
   <association id="25">    
-    <bendpoint x="1571" y="1342"/>    
-    <end type="SOURCE" refId="10" navigable="false">      
-      <attribute id="26" name="developers">        
-        <position height="0" width="0" x="23" y="-236"/>      
+    <bendpoint x="487" y="283"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="26" name="configProperties">        
+        <position height="18" width="87" x="566" y="307"/>      
       </attribute>      
-      <multiplicity id="27" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="23" y="-236"/>      
+      <multiplicity id="27" minimum="0" maximum="1">        
+        <position height="0" width="0" x="400" y="-15"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
+    <end type="TARGET" refId="5" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="28">    
-    <end type="SOURCE" refId="12" navigable="false">      
-      <attribute id="29" name="developer">        
+    <bendpoint x="926" y="1243"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="29" name="teamDeveloper">        
         <position height="0" width="0" x="23" y="-236"/>      
       </attribute>      
-      <multiplicity id="30" minimum="0" maximum="1">        
+      <multiplicity id="30" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="23" y="-236"/>      
       </multiplicity>    
     </end>    
@@ -195,44 +196,31 @@
     <display labels="true" multiplicity="true"/>  
   </association>  
   <association id="31">    
-    <bendpoint x="926" y="1243"/>    
-    <end type="SOURCE" refId="11" navigable="false">      
-      <attribute id="32" name="teamDeveloper">        
-        <position height="0" width="0" x="23" y="-236"/>      
-      </attribute>      
-      <multiplicity id="33" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="23" y="-236"/>      
-      </multiplicity>    
-    </end>    
-    <end type="TARGET" refId="2" navigable="true"/>    
-    <display labels="true" multiplicity="true"/>  
-  </association>  
-  <association id="34">    
     <end type="SOURCE" refId="6" navigable="false">      
-      <attribute id="35" name="degreeKnows">        
+      <attribute id="32" name="degreeKnows">        
         <position height="0" width="0" x="31" y="-264"/>      
       </attribute>      
-      <multiplicity id="36" minimum="0" maximum="2147483647">        
+      <multiplicity id="33" minimum="0" maximum="2147483647">        
         <position height="0" width="0" x="31" y="-264"/>      
       </multiplicity>    
     </end>    
     <end type="TARGET" refId="12" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <association id="37">    
-    <end type="SOURCE" refId="4" navigable="false">      
-      <attribute id="38" name="matrixFileDevelopersPerCommits">        
-        <position height="0" width="0" x="30" y="-208"/>      
+  <association id="34">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="35" name="developer">        
+        <position height="0" width="0" x="23" y="-236"/>      
       </attribute>      
-      <multiplicity id="39" minimum="0" maximum="2147483647">        
-        <position height="0" width="0" x="30" y="-208"/>      
+      <multiplicity id="36" minimum="0" maximum="1">        
+        <position height="0" width="0" x="23" y="-236"/>      
       </multiplicity>    
     </end>    
-    <end type="TARGET" refId="10" navigable="true"/>    
+    <end type="TARGET" refId="2" navigable="true"/>    
     <display labels="true" multiplicity="true"/>  
   </association>  
-  <generalization id="40">    
-    <end type="SOURCE" refId="9"/>    
+  <generalization id="37">    
+    <end type="SOURCE" refId="6"/>    
     <end type="TARGET" refId="3"/>  
   </generalization>  
   <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
