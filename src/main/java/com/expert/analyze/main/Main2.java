@@ -32,19 +32,23 @@ public class Main2 {
 	//private static String linkTeste = "https://gitlab.dpf.gov.br/mobilizacao/mobilizacao-rest.git";
 	private static String linkTeste = "https://github.com/JoseRenan/POP-Judge";
 	//private static String linkTeste = "https://github.com/usebens/amazon.git";
-	//private static String projectTeste = "teste_project";
-    private static String projectTeste = "mobilizacao-rest";
+	private static String projectTeste = "sisjud";
+	//private static String projectTeste = "usebens";
+    //private static String projectTeste = "mobilizacao-rest";
 	private static String repositPrivate = "https://gitlab.dpf.gov.br/mobilizacao/mobilizacao-rest.git";
 
 	public static void main(String[] args) {
 		repositorioInit();
-		repositorio.findCommitsPerDate(LocalDate.of(2018,01,01), LocalDate.of(2018,01,15));
-		// teste();
+		//repositorio.findCommitsPerDate(LocalDate.of(2018,01,01), LocalDate.of(2018,01,06));
+		System.out.println("Commits Inital:" + repositorio.getRepositoryGit().getCommitsLocal().size());
+		System.out.println("Files Inital:" + repositorio.getRepositoryGit().getFilesProject().size());
+		System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
+		//teste();
 
 		//teste();
 		//testeLOC();
 		
-		testeDOK();
+		//testeDOK();
 	}
 
 	private static void repositorioInit() {
@@ -80,22 +84,22 @@ public class Main2 {
 		dc.contributorsNormalizere();
 		repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
 		System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
+		System.out.println("-------------------------------");
+		queryCommitPerDate("01/01/2018","01/06/2018");
+		repositorio.loadFilesProject();
+		repositorio.loadTeamDeveloper();
+		System.out.println("Branch Local" + repositorio.getBranchesLocal());
+		System.out.println("Commits:" + repositorio.getRepositoryGit().getCommitsLocal().size());
+		System.out.println("Files:" + repositorio.getRepositoryGit().getFilesProject().size());
 		
-		//queryCommitPerDate("01/01/2018","02/02/2018");
-		//repositorio.loadFilesProject();
-		//repositorio.loadTeamDeveloper();
-		//System.out.println("Branch Local" + repositorio.getBranchesLocal());
-		//System.out.println("Commits:" + repositorio.getRepositoryGit().getCommitsLocal().size());
-		//System.out.println("Files:" + repositorio.getRepositoryGit().getFilesProject().size());
-		
-		// Normalize team developer
-		//dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
-		//dc.contributorsNormalizere();
-		//repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
-		//System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
-		//		repositorio.getRepositoryGit().getTeamDeveloper().forEach(d ->{
-		//		System.out.println(d);
-		//		});
+		 //Normalize team developer
+		dc = new DeveloperController(repositorio.getRepositoryGit().getTeamDeveloper());
+		dc.contributorsNormalizere();
+		repositorio.getRepositoryGit().setTeamDeveloper(dc.getTeamDeveloper());
+		System.out.println("Developer:"+repositorio.getRepositoryGit().getTeamDeveloper().size());
+				repositorio.getRepositoryGit().getTeamDeveloper().forEach(d ->{
+				System.out.println(d);
+				});
 		
 	}
 
