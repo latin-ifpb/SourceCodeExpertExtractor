@@ -20,14 +20,14 @@ java -jar ExpertAnalyzer.jar -prop [path_file.properties] -mc -ml -mk --t -ti 00
  * -mc : Extração pela métrica de commit por arquivo;
  * -ml : Extração pela métrica de número de linhas modificadas no arquivo;
  * -mk : Extração pela métrica de grau de conhecimento de código no arquivo;
- *--t, -ti, -tf : Permite adição de períodos de extrações;
+ * --t, -ti, -tf : Permite adição de períodos de extrações;
 
  * **Arquivo Properties**
-	 c= true(Indica a clonagem);*
-	 l= Link do repositório;*
-	 n= Nome do projeto;*
+	 c= true(Indica a clonagem)(*);
+	 l= Link do repositório(*);
+	 n= Nome do projeto(*);
 	 b= branch(especifica uma branch para analisar);
-	 a= false(indica a necessidade de autenticação);*
+	 a= false(indica a necessidade de autenticação)(*);
 	 u= user;
 	 p= password;
 	 
