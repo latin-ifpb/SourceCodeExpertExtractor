@@ -23,15 +23,15 @@ java -jar ExpertAnalyzer.jar -prop [path_file.properties] -mc -ml -mk --t -ti 00
  * --t, -ti, -tf : Permite adição de períodos de extrações;
 
  * **Arquivo Properties**
-	 c= true(Indica a clonagem)(*);
-	 l= Link do repositório(*);
-	 n= Nome do projeto(*);
-	 b= branch(especifica uma branch para analisar);
-	 a= false(indica a necessidade de autenticação)(*);
-	 u= user;
-	 p= password;
+	* c= true(Indica a clonagem)(X);
+	* l= Link do repositório(X);
+	* n= Nome do projeto(X);
+	* b= branch(especifica uma branch para analisar);
+	* a= false(indica a necessidade de autenticação)(X);
+	* u= user;
+	* p= password;
 	 
-	 Obs.: (*) Paramêtros Obrigatórios.
+	 Obs.: (X) Paramêtros Obrigatórios.
 
 ## Versioning
 
