@@ -1,4 +1,4 @@
-# Expert Analyzer
+# Soucer Code Experts Extractor
 
 A ferramenta desenvolvida para auxiliar na identificação dos especialistas de códigos fontes, no qual manipula as informações contidas nos sistemas de controles de 
 versões de códigos para sugerir os especialistas, utilizando um conjuntos de métodos e métricas para aferir tal sugestão.
